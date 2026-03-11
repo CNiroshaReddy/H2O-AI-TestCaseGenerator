@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - H2O AI Test Case Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>H2O AI Test Case Generator</h1>
+        <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="upload">Upload your docs</button>
+            <button class="tab-btn" data-tab="output">AI_TestOutput</button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Tab 1: Upload your docs -->
+            <div id="upload-tab" class="tab-pane active">
+                <div class="upload-section">
+                    <h2>Upload Documents or Add URLs</h2>
+                    <p style="color: #666; margin-bottom: 15px;">Step 1: Add files or URLs, then click Upload button. Step 2: Click Generate button.</p>
+                    
+                    <div id="inputs-container">
+                        <div class="input-row">
+                            <input type="file" class="file-input" accept=".doc,.docx,.pdf,.txt" multiple>
+                            <input type="text" class="url-input" placeholder="Or enter webpage URL (e.g., https://www.amazon.com)">
+                            <button class="btn-add" onclick="addInputRow()">+</button>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-upload" onclick="handleUpload()">Upload</button>
+                    
+                    <div id="uploaded-list" class="uploaded-list"></div>
+                    
+                    <div id="validation-message" class="validation-message"></div>
+                </div>
+                
+                <div class="footer-action">
+                    <button id="generateBtn" class="btn-generate" onclick="generateTestCases()" disabled>
+                        Generate TS's & TC's
+                    </button>
+                    <p style="color: #999; font-size: 12px; margin-top: 10px;">Button will be enabled after uploading files/URLs</p>
+                    <div id="loading" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>AI is generating test cases...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: AI_TestOutput -->
+            <div id="output-tab" class="tab-pane">
+                <div class="output-section">
+                    <h2>Generated Test Cases</h2>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="viewResults()">View your TS & TC</button>
+                        <button class="btn-primary" onclick="downloadExcel()">Download</button>
+                    </div>
+                    
+                    <div id="results-container" class="results-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
