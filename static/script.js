@@ -1,5 +1,14 @@
 let uploadedItems = [];
 
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear results container on page load
+    const resultsContainer = document.getElementById('results-container');
+    if (resultsContainer) {
+        resultsContainer.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">No results available. Please upload documents/URLs and generate test cases first.</p>';
+    }
+});
+
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -84,14 +93,14 @@ function handleUpload() {
     
     if (hasInput) {
         updateUploadedList();
-        if (duplicates.length === 0) {
-            showValidation('Items added successfully!', 'success');
-        } else {
-            showValidation('Some items added (duplicates skipped)', 'success');
-        }
         document.getElementById('generateBtn').disabled = false;
+        if (duplicates.length === 0) {
+            showValidation('✅ Items added successfully!', 'success');
+        } else {
+            showValidation('✅ Some items added (duplicates skipped)', 'success');
+        }
     } else if (duplicates.length === 0) {
-        showValidation('Please select files or enter URLs', 'error');
+        showValidation('❌ Please select files or enter URLs', 'error');
     }
 }
 
@@ -195,6 +204,10 @@ async function generateTestCases() {
             document.querySelector('[data-tab="output"]').classList.add('active');
             document.getElementById('output-tab').classList.add('active');
             
+            // Clear results container - don't display automatically
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">Click "View your TS & TC" button to preview the generated test cases.</p>';
+            
             // Show success alert
             alert(`✅ Success!\n\nGenerated ${data.results.length} Test Scenarios with ${totalTestCases} Test Cases.\n\nClick "View your TS & TC" button to preview results.`);
             
@@ -231,7 +244,7 @@ async function viewResults() {
         } else {
             console.log('No results found');
             alert('⚠️ No results available. Please generate test cases first.');
-            document.getElementById('results-container').innerHTML = '<p style="text-align:center;padding:20px;color:#666;">No results available. Please upload documents/URLs and generate test cases first.</p>';
+            document.getElementById('results-container').innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">No results available. Please upload documents/URLs and generate test cases first.</p>';
         }
     } catch (error) {
         console.error('Error loading results:', error);
@@ -245,7 +258,7 @@ function displayResults(results) {
     const container = document.getElementById('results-container');
     
     if (!results || results.length === 0) {
-        container.innerHTML = '<p style="text-align:center;padding:20px;color:#666;">No test cases to display</p>';
+        container.innerHTML = '<p style="text-align:center;padding:20px;color:#6B7280;">No test cases to display</p>';
         return;
     }
     
