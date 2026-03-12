@@ -7,6 +7,7 @@ from openpyxl.styles import Font, Alignment, PatternFill
 import json
 import tempfile
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 app.secret_key = 'h2o-ai-test-generator-secret-key'
@@ -23,6 +24,9 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
+
+# In-memory storage for results (user_id -> results)
+results_storage = {}
 
 # Valid credentials
 VALID_CREDENTIALS = {
@@ -46,7 +50,12 @@ def login():
         if username in VALID_CREDENTIALS and VALID_CREDENTIALS[username] == password:
             session.permanent = True
             session['logged_in'] = True
-            print(f"User '{username}' logged in successfully. Session ID: {session.get('_id', 'No ID')}")
+            
+            # Generate unique user ID for this session
+            if 'user_id' not in session:
+                session['user_id'] = str(uuid.uuid4())
+            
+            print(f"User '{username}' logged in successfully. User ID: {session.get('user_id')}")
             return jsonify({'success': True})
         else:
             return jsonify({'success': False, 'message': 'Invalid credentials'})
@@ -55,8 +64,11 @@ def login():
 
 @app.route('/logout')
 def logout():
+    user_id = session.get('user_id')
+    if user_id and user_id in results_storage:
+        del results_storage[user_id]
     session.pop('logged_in', None)
-    session.pop('test_results', None)
+    session.pop('user_id', None)
     return redirect(url_for('login'))
 
 @app.route('/home')
@@ -75,10 +87,17 @@ def upload():
         return jsonify({'success': False, 'message': 'Not authenticated'})
     
     try:
+        # Ensure user has a user_id
+        if 'user_id' not in session:
+            session['user_id'] = str(uuid.uuid4())
+        
+        user_id = session['user_id']
+        
         files = request.files.getlist('files')
         urls = request.form.getlist('urls')
         
         print(f"\n=== Upload Request ===")
+        print(f"User ID: {user_id}")
         print(f"Files received: {len(files)}")
         for f in files:
             if f and f.filename:
@@ -124,12 +143,11 @@ def upload():
         print(f"Generated {len(test_results)} test scenarios")
         
         if test_results and len(test_results) > 0:
-            # Store results in session
-            session['test_results'] = test_results
+            # Store results in memory storage
+            results_storage[user_id] = test_results
             session.modified = True
             
-            print(f"Stored {len(test_results)} scenarios in session")
-            print(f"Session ID: {session.get('_id', 'No ID')}")
+            print(f"Stored {len(test_results)} scenarios for user {user_id}")
             
             return jsonify({'success': True, 'results': test_results})
         else:
@@ -146,10 +164,17 @@ def get_results():
     if 'logged_in' not in session:
         return jsonify({'success': False, 'message': 'Not authenticated'})
     
-    # Get from session
-    results = session.get('test_results', [])
+    # Ensure user has a user_id
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+    
+    user_id = session['user_id']
+    
+    # Get from memory storage
+    results = results_storage.get(user_id, [])
     
     print(f"\n=== Get Results ===")
+    print(f"User ID: {user_id}")
     print(f"Results found: {len(results)} scenarios")
     
     if results:
@@ -162,10 +187,17 @@ def download_excel():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
     
-    # Get from session
-    results = session.get('test_results', [])
+    # Ensure user has a user_id
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+    
+    user_id = session['user_id']
+    
+    # Get from memory storage
+    results = results_storage.get(user_id, [])
     
     print(f"\n=== Download Excel ===")
+    print(f"User ID: {user_id}")
     print(f"Results available: {len(results) if results else 0} scenarios")
     
     if not results or len(results) == 0:
