@@ -1,0 +1,79 @@
+System Name: Hospital Management System
+
+Functional Requirements
+
+• Patients should be able to book appointments with doctors
+• Patients cannot book more than 3 appointments in a month
+• If patient attempts to book 4th appointment, display "Monthly appointment limit exceeded."
+• The system must validate patient email format
+• Patients must be logged in before booking appointments
+• The system must send email confirmation when appointment is booked
+• If doctor is not available, display "Doctor currently unavailable."
+• Patients should be able to cancel appointments within 7 days of booking
+• If patient attempts to cancel after 7 days, display "Cancellation period expired."
+• The system must update doctor availability when appointment is booked
+• The system must restore doctor availability when appointment is cancelled
+• Patient phone number must be 10 digits
+• Medical record must contain valid patient ID (8 digits)
+
+System Name: Hotel Booking System
+
+Functional Requirements
+
+• Users should be able to search for hotels by location, price range, or rating
+• Users should be able to filter hotels by amenities
+• Users should be able to sort hotels by price or rating
+• The system must display hotel name, price, description, and availability
+• If no hotels match the search criteria, display "No hotels found."
+• Users should be able to add rooms to booking cart
+• Users should be able to remove rooms from booking cart
+• Users should be able to update room quantity in cart
+• The system must calculate total price including taxes and service charges
+• Users cannot book more than 5 rooms at a time
+• If user attempts to book 6th room, display "Maximum rooms limit exceeded."
+• Users must be logged in before checkout
+• Users should be able to enter billing address
+• Users should be able to select payment method (Credit Card, Debit Card, UPI)
+• The system must validate payment information
+• If payment fails, display "Payment failed. Please try again."
+• If payment succeeds, display "Booking confirmed successfully."
+
+System Name: Social Media Platform
+
+Functional Requirements
+
+• Users should be able to create posts with text and images
+• Users should be able to like posts
+• Users cannot like the same post more than once
+• If user attempts to like again, display "Post already liked."
+• The system must validate image format (JPG, PNG, GIF only)
+• Users must be logged in before creating posts
+• The system must send notification when post receives 10 likes
+• If post contains inappropriate content, display "Post violates community guidelines."
+• Users should be able to delete posts within 24 hours of creation
+• If user attempts to delete after 24 hours, display "Post deletion window expired."
+• The system must update like count when post is liked
+• The system must decrease like count when post is unliked
+• User email must be in valid format
+• User username must be 3-20 characters
+
+System Name: Banking System
+
+Functional Requirements
+
+• Users should be able to view account balance
+• Users should be able to transfer money to other accounts
+• Users cannot transfer more than 100000 in a single transaction
+• If user attempts to transfer more, display "Transaction limit exceeded."
+• The system must validate account number (12 digits)
+• Users must be logged in before transferring money
+• The system must send SMS confirmation when money is transferred
+• If recipient account is inactive, display "Recipient account is inactive."
+• Users should be able to view transaction history
+• Users should be able to download transaction statement within 90 days
+• If user attempts to download after 90 days, display "Statement download period expired."
+• The system must deduct amount from sender account when transfer succeeds
+• The system must add amount to recipient account when transfer succeeds
+• User phone number must be 10 digits
+• User PIN must be 4 digits
+

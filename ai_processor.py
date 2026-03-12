@@ -8,6 +8,7 @@ class AIProcessor:
     def __init__(self):
         self.test_scenarios = []
         self.generated_scenarios = set()
+        self.test_types = ['Positive', 'Negative', 'Boundary', 'Validation', 'Security', 'Functional', 'Message', 'Edge Case', 'Performance', 'Data Consistency']
     
     def process_documents(self, files_data, urls):
         """Process documents and generate unique requirement-driven test cases"""
@@ -94,7 +95,7 @@ class AIProcessor:
                 'test_cases': []
             }
             
-            test_cases = self._generate_comprehensive_test_cases(req_data, req_idx)
+            test_cases = self._generate_dynamic_test_cases(req_data)
             
             for test_case in test_cases:
                 tc = {
@@ -118,12 +119,10 @@ class AIProcessor:
         """Extract requirements from ANY format"""
         requirements = []
         
-        # Clean headers
         content = re.sub(r'System Name:.*?\n', '', content, flags=re.IGNORECASE)
         content = re.sub(r'Functional Requirements\n', '', content, flags=re.IGNORECASE)
         content = re.sub(r'Non-Functional Requirements\n', '', content, flags=re.IGNORECASE)
         
-        # Method 1: Bullet/Numbered format
         lines = content.split('\n')
         for line in lines:
             line = line.strip()
@@ -132,7 +131,6 @@ class AIProcessor:
                 if len(req) > 15:
                     requirements.append(req)
         
-        # Method 2: Paragraph format (sentence splitting)
         if not requirements:
             sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', content)
             for sentence in sentences:
@@ -140,7 +138,6 @@ class AIProcessor:
                 if len(sentence) > 20 and sentence and not any(x in sentence.lower() for x in ['system name', 'functional', 'requirements']):
                     requirements.append(sentence)
         
-        # Method 3: Line-by-line (each non-empty line is a requirement)
         if not requirements:
             for line in lines:
                 line = line.strip()
@@ -150,68 +147,73 @@ class AIProcessor:
         return requirements
     
     def _analyze_requirements(self, requirements):
-        """Analyze requirements and extract components"""
+        """Analyze requirements and extract universal patterns"""
         analysis = {}
         
         for idx, req in enumerate(requirements):
             req_id = f'REQ-{idx+1}'
             analysis[req_id] = {
                 'requirement': req,
-                'actors': self._extract_actors(req),
-                'actions': self._extract_actions(req),
-                'entities': self._extract_entities(req),
-                'conditions': self._extract_conditions(req),
-                'constraints': self._extract_constraints(req),
-                'validations': self._extract_validations(req),
-                'business_rules': self._extract_business_rules(req),
-                'error_scenarios': self._extract_error_scenarios(req),
-                'security_concerns': self._extract_security_concerns(req)
+                'actions': self._extract_universal_actions(req),
+                'entities': self._extract_universal_entities(req),
+                'conditions': self._extract_universal_conditions(req),
+                'constraints': self._extract_universal_constraints(req),
+                'messages': self._extract_messages(req),
+                'numbers': self._extract_numbers(req),
+                'error_keywords': self._extract_error_keywords(req)
             }
         
         return analysis
     
-    def _extract_actors(self, req):
-        actors = set()
-        patterns = ['user', 'admin', 'system', 'application', 'customer', 'guest', 'member']
-        for p in patterns:
-            if p in req.lower():
-                actors.add(p.capitalize())
-        return list(actors) if actors else ['User']
-    
-    def _extract_actions(self, req):
+    def _extract_universal_actions(self, req):
+        """Extract ANY action verb from requirement"""
         actions = set()
-        patterns = ['create', 'register', 'login', 'logout', 'verify', 'validate', 'lock', 'unlock', 'browse', 'search', 'filter', 'sort', 'add', 'remove', 'update', 'delete', 'edit', 'view', 'display', 'show', 'hide', 'checkout', 'pay', 'purchase', 'generate', 'send', 'receive', 'download', 'upload', 'export', 'import', 'cancel', 'retry', 'reset', 'recover', 'restore', 'backup', 'sync', 'refresh', 'reload', 'submit', 'approve', 'reject', 'confirm', 'deny']
-        for p in patterns:
-            if p in req.lower():
-                actions.add(p)
+        action_patterns = ['browse', 'filter', 'sort', 'search', 'add', 'remove', 'update', 'delete', 'edit', 'view', 'display', 'show', 'hide', 'checkout', 'pay', 'purchase', 'cancel', 'borrow', 'return', 'mark', 'send', 'notify', 'prevent', 'allow', 'block', 'validate', 'verify', 'calculate', 'reduce', 'increase', 'create', 'register', 'login', 'logout', 'lock', 'unlock', 'generate', 'receive', 'download', 'upload', 'export', 'import', 'retry', 'reset', 'recover', 'restore', 'backup', 'sync', 'refresh', 'reload', 'submit', 'approve', 'reject', 'confirm', 'deny', 'enable', 'disable']
+        
+        req_lower = req.lower()
+        for action in action_patterns:
+            if action in req_lower:
+                actions.add(action)
+        
         return list(actions) if actions else ['execute']
     
-    def _extract_entities(self, req):
+    def _extract_universal_entities(self, req):
+        """Extract ANY entity/object from requirement"""
         entities = set()
-        patterns = ['account', 'user', 'email', 'password', 'product', 'cart', 'order', 'payment', 'address', 'event', 'registration', 'ticket', 'seat', 'confirmation', 'form', 'book', 'document', 'file', 'record', 'item', 'data', 'page', 'button', 'field', 'profile', 'dashboard', 'notification', 'message', 'comment', 'review', 'rating', 'category', 'tag', 'filter', 'report', 'invoice', 'receipt', 'transaction', 'session', 'token', 'permission', 'role']
-        for p in patterns:
-            if p in req.lower():
-                entities.add(p)
+        entity_patterns = ['product', 'order', 'payment', 'cart', 'user', 'address', 'email', 'notification', 'book', 'account', 'form', 'item', 'inventory', 'stock', 'card', 'phone', 'password', 'event', 'registration', 'ticket', 'seat', 'confirmation', 'document', 'file', 'record', 'data', 'page', 'button', 'field', 'profile', 'dashboard', 'message', 'comment', 'review', 'rating', 'category', 'tag', 'filter', 'report', 'invoice', 'receipt', 'transaction', 'session', 'token', 'permission', 'role', 'copy', 'status', 'limit', 'count', 'date', 'time', 'link', 'request', 'response']
+        
+        req_lower = req.lower()
+        for entity in entity_patterns:
+            if entity in req_lower:
+                entities.add(entity)
+        
         return list(entities) if entities else ['item']
     
-    def _extract_conditions(self, req):
+    def _extract_universal_conditions(self, req):
+        """Extract ANY condition from requirement"""
         conditions = set()
-        if 'if' in req.lower() or 'when' in req.lower():
+        
+        if any(x in req.lower() for x in ['if', 'when', 'while']):
             conditions.add('conditional')
-        if 'must' in req.lower() or 'should' in req.lower() or 'required' in req.lower():
+        if any(x in req.lower() for x in ['must', 'should', 'required', 'mandatory']):
             conditions.add('mandatory')
-        if 'can' in req.lower() or 'able to' in req.lower() or 'may' in req.lower():
+        if any(x in req.lower() for x in ['can', 'able to', 'may', 'allow']):
             conditions.add('capability')
-        if 'not' in req.lower() or 'cannot' in req.lower() or 'should not' in req.lower():
+        if any(x in req.lower() for x in ['not', 'cannot', 'should not', 'prevent', 'block']):
             conditions.add('restriction')
-        if 'before' in req.lower() or 'after' in req.lower() or 'during' in req.lower():
+        if any(x in req.lower() for x in ['before', 'after', 'during', 'within']):
             conditions.add('temporal')
-        if 'only' in req.lower() or 'only if' in req.lower():
+        if any(x in req.lower() for x in ['only', 'only if', 'unless']):
             conditions.add('exclusive')
+        if any(x in req.lower() for x in ['and', 'or', 'both']):
+            conditions.add('logical')
+        
         return list(conditions) if conditions else ['standard']
     
-    def _extract_constraints(self, req):
+    def _extract_universal_constraints(self, req):
+        """Extract ANY constraint from requirement"""
         constraints = set()
+        
         if any(x in req.lower() for x in ['maximum', 'max', 'limit', 'exceed', 'more than', 'not more', 'up to']):
             constraints.add('max_limit')
         if any(x in req.lower() for x in ['minimum', 'min', 'at least', 'exactly', 'no less']):
@@ -220,140 +222,70 @@ class AIProcessor:
             constraints.add('format')
         if any(x in req.lower() for x in ['available', 'exist', 'present', 'full', 'empty', 'out of stock', 'unavailable']):
             constraints.add('availability')
-        if any(x in req.lower() for x in ['email', 'phone', 'address', 'name', 'payment', 'credit', 'debit']):
-            constraints.add('field_validation')
-        if any(x in req.lower() for x in ['unique', 'duplicate', 'distinct']):
+        if any(x in req.lower() for x in ['unique', 'duplicate', 'distinct', 'same', 'twice', 'simultaneously']):
             constraints.add('uniqueness')
         if any(x in req.lower() for x in ['time', 'minute', 'hour', 'day', 'week', 'month', 'year', 'second', 'duration', 'timeout', 'expir']):
             constraints.add('time_based')
+        if any(x in req.lower() for x in ['email', 'phone', 'address', 'name', 'payment', 'credit', 'debit']):
+            constraints.add('field_validation')
+        
         return list(constraints) if constraints else []
     
-    def _extract_validations(self, req):
-        validations = set()
-        if 'email' in req.lower() and 'valid' in req.lower():
-            validations.add('Valid email format')
-        if 'unique' in req.lower() and 'email' in req.lower():
-            validations.add('Email must be unique')
-        if 'password' in req.lower():
-            if '8' in req or 'character' in req.lower():
-                validations.add('Minimum 8 characters')
-            if 'uppercase' in req.lower():
-                validations.add('At least one uppercase')
-            if 'number' in req.lower() or 'digit' in req.lower():
-                validations.add('At least one number')
-            if 'special' in req.lower():
-                validations.add('At least one special character')
-        if 'phone' in req.lower() and '10' in req:
-            validations.add('Exactly 10 digits')
-        if 'between' in req.lower() and any(x in req.lower() for x in ['1', '5']):
-            validations.add('Range validation')
-        return list(validations) if validations else []
+    def _extract_messages(self, req):
+        """Extract specific messages from requirement"""
+        messages = re.findall(r'"([^"]*)"', req)
+        return messages if messages else []
     
-    def _extract_business_rules(self, req):
-        rules = set()
-        if 'verification' in req.lower() or 'activate' in req.lower() or 'confirm' in req.lower():
-            rules.add('Verification required')
-        if 'confirmation' in req.lower():
-            rules.add('Generate confirmation')
-        if 'email' in req.lower() and ('send' in req.lower() or 'receive' in req.lower() or 'notification' in req.lower()):
-            rules.add('Send email notification')
-        if 'lock' in req.lower():
-            rules.add('Account locking')
-        if 'out of stock' in req.lower() or 'unavailable' in req.lower():
-            rules.add('Check availability')
-        if 'payment' in req.lower():
-            rules.add('Process payment')
-        if 'order' in req.lower():
-            rules.add('Generate order')
-        if 'cancel' in req.lower():
-            rules.add('Cancel operation')
-        return list(rules) if rules else []
+    def _extract_numbers(self, req):
+        """Extract numbers (limits, days, etc.)"""
+        numbers = re.findall(r'\d+', req)
+        return numbers if numbers else []
     
-    def _extract_error_scenarios(self, req):
+    def _extract_error_keywords(self, req):
+        """Extract error-related keywords"""
         errors = set()
-        if 'invalid' in req.lower():
-            errors.add('Invalid input')
-        if 'incorrect' in req.lower() or 'wrong' in req.lower():
-            errors.add('Incorrect data')
-        if 'lock' in req.lower():
-            errors.add('Account locked')
-        if 'out of stock' in req.lower():
-            errors.add('Out of stock')
-        if 'payment' in req.lower() and 'fail' in req.lower():
-            errors.add('Payment failure')
-        if 'empty' in req.lower() or 'required' in req.lower():
-            errors.add('Missing required field')
-        if 'duplicate' in req.lower():
-            errors.add('Duplicate entry')
-        if 'not found' in req.lower() or 'does not exist' in req.lower():
-            errors.add('Not found')
+        error_patterns = ['invalid', 'incorrect', 'wrong', 'error', 'fail', 'failed', 'failure', 'prevent', 'block', 'deny', 'reject', 'lock', 'locked', 'unavailable', 'not found', 'missing', 'required', 'empty', 'duplicate', 'exceed', 'limit']
+        
+        req_lower = req.lower()
+        for error in error_patterns:
+            if error in req_lower:
+                errors.add(error)
+        
         return list(errors) if errors else []
     
-    def _extract_security_concerns(self, req):
-        security = set()
-        if 'password' in req.lower():
-            security.add('Password security')
-        if 'email' in req.lower():
-            security.add('Email validation')
-        if 'payment' in req.lower() or 'credit' in req.lower():
-            security.add('Payment security')
-        if 'encrypt' in req.lower() or 'secure' in req.lower():
-            security.add('Encryption')
-        if 'token' in req.lower() or 'session' in req.lower():
-            security.add('Session management')
-        if 'permission' in req.lower() or 'access' in req.lower():
-            security.add('Access control')
-        return list(security) if security else []
-    
-    def _generate_comprehensive_test_cases(self, req_data, req_idx):
-        """Generate 6-10 comprehensive test cases for 75%+ coverage"""
+    def _generate_dynamic_test_cases(self, req_data):
+        """Generate dynamic test cases with 75%+ coverage for ANY requirement"""
         req = req_data['requirement']
-        test_cases = []
-        
         actions = req_data['actions']
         entities = req_data['entities']
+        conditions = req_data['conditions']
         constraints = req_data['constraints']
-        validations = req_data['validations']
-        errors = req_data['error_scenarios']
+        messages = req_data['messages']
+        numbers = req_data['numbers']
+        errors = req_data['error_keywords']
         
-        # 1. Positive Test
-        test_cases.append(self._create_positive_test(req, actions, entities))
+        test_cases = []
+        req_lower = req.lower()
         
-        # 2. Negative Test
-        test_cases.append(self._create_negative_test(req, actions, entities, errors))
+        action = self._select_primary_action(actions, req_lower)
+        entity = self._select_primary_entity(entities, req_lower)
         
-        # 3. Boundary Test
-        if constraints:
-            test_cases.append(self._create_boundary_test(req, actions, entities, constraints))
-        
-        # 4. Validation Test
-        if validations:
-            test_cases.append(self._create_validation_test(req, validations))
-        
-        # 5. Security Test
-        test_cases.append(self._create_security_test(req, actions, entities))
-        
-        # 6. Error Handling Test
-        if errors:
-            test_cases.append(self._create_error_handling_test(req, errors))
-        
-        # 7. Edge Case Test
-        test_cases.append(self._create_edge_case_test(req, actions, entities, constraints))
-        
-        # 8. Functional Test
-        test_cases.append(self._create_functional_test(req, actions, entities))
-        
-        # 9. Data Consistency Test
-        test_cases.append(self._create_data_consistency_test(req, actions, entities))
-        
-        # 10. Performance Test
-        test_cases.append(self._create_performance_test(req, actions, entities))
+        # Generate all 10 test types dynamically
+        test_cases.append(self._generate_positive_test(action, entity, req_lower))
+        test_cases.append(self._generate_negative_test(action, entity, req_lower))
+        test_cases.append(self._generate_boundary_test(action, entity, constraints, numbers, req_lower))
+        test_cases.append(self._generate_validation_test(action, entity, constraints, req_lower))
+        test_cases.append(self._generate_security_test(action, entity, req_lower))
+        test_cases.append(self._generate_functional_test(action, entity, conditions, req_lower))
+        test_cases.append(self._generate_message_test(action, entity, messages, req_lower))
+        test_cases.append(self._generate_edge_case_test(action, entity, constraints, req_lower))
+        test_cases.append(self._generate_performance_test(action, entity, req_lower))
+        test_cases.append(self._generate_data_consistency_test(action, entity, req_lower))
         
         return test_cases
     
-    def _create_positive_test(self, req, actions, entities):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
+    def _generate_positive_test(self, action, entity, req_lower):
+        """Generate positive test case"""
         return {
             'steps': f'1. Prepare valid {entity} with all required data\n2. Execute {action} operation\n3. Verify system accepts input\n4. Confirm {action} completes successfully\n5. Verify success message and data saved',
             'expected': f'{action.capitalize()} operation succeeds with valid {entity}',
@@ -362,35 +294,33 @@ class AIProcessor:
             'priority': 'High'
         }
     
-    def _create_negative_test(self, req, actions, entities, errors):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
-        error = errors[0] if errors else 'Invalid input'
+    def _generate_negative_test(self, action, entity, req_lower):
+        """Generate negative test case"""
         return {
             'steps': f'1. Prepare invalid {entity}\n2. Attempt {action} operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify {action} not executed',
-            'expected': f'{action.capitalize()} operation fails with error: {error}',
+            'expected': f'{action.capitalize()} operation fails with appropriate error message',
             'test_data': f'Invalid {entity}: Missing or incorrect data',
             'type': 'Negative',
             'priority': 'High'
         }
     
-    def _create_boundary_test(self, req, actions, entities, constraints):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
-        
-        if 'max_limit' in constraints:
+    def _generate_boundary_test(self, action, entity, constraints, numbers, req_lower):
+        """Generate boundary test case"""
+        if 'max_limit' in constraints and numbers:
+            limit = numbers[0]
             return {
-                'steps': f'1. Prepare {entity} at maximum allowed value\n2. Execute {action} operation\n3. Verify system accepts maximum\n4. Prepare {entity} exceeding maximum\n5. Verify system rejects excess',
-                'expected': f'{action.capitalize()} accepts maximum but rejects excess',
-                'test_data': f'{entity} at max boundary and beyond',
+                'steps': f'1. {action.capitalize()} {entity} at maximum limit ({limit})\n2. Verify system accepts\n3. Attempt to {action} {entity} exceeding limit ({int(limit)+1})\n4. Verify system rejects with appropriate message\n5. Confirm limit enforced',
+                'expected': f'System accepts {entity} up to {limit}, rejects beyond limit',
+                'test_data': f'{entity} count: {limit} (accepted), {int(limit)+1} (rejected)',
                 'type': 'Boundary',
                 'priority': 'High'
             }
-        elif 'min_limit' in constraints:
+        elif 'time_based' in constraints and numbers:
+            days = numbers[0]
             return {
-                'steps': f'1. Prepare {entity} below minimum\n2. Attempt {action} operation\n3. Verify system rejects\n4. Prepare {entity} at minimum\n5. Verify system accepts',
-                'expected': f'{action.capitalize()} rejects below minimum, accepts at minimum',
-                'test_data': f'{entity} at min boundary',
+                'steps': f'1. {action.capitalize()} {entity}\n2. Wait {days} days\n3. Verify status remains normal\n4. Wait 1 more day (day {int(days)+1})\n5. Verify status changes appropriately',
+                'expected': f'System enforces {days}-day rule correctly',
+                'test_data': f'Time-based test: {days} days and {int(days)+1} days',
                 'type': 'Boundary',
                 'priority': 'High'
             }
@@ -403,19 +333,27 @@ class AIProcessor:
                 'priority': 'Medium'
             }
     
-    def _create_validation_test(self, req, validations):
-        validation = validations[0] if validations else 'Format validation'
-        return {
-            'steps': f'1. Enter invalid data violating {validation}\n2. Verify validation error\n3. Enter valid data meeting {validation}\n4. Verify system accepts\n5. Confirm validation enforced',
-            'expected': f'{validation} is properly enforced',
-            'test_data': f'Invalid: Non-compliant data, Valid: Compliant data',
-            'type': 'Validation',
-            'priority': 'High'
-        }
+    def _generate_validation_test(self, action, entity, constraints, req_lower):
+        """Generate validation test case"""
+        if 'format' in constraints or 'field_validation' in constraints:
+            return {
+                'steps': f'1. Enter invalid format for {entity}\n2. Verify validation error\n3. Enter valid format\n4. Verify system accepts\n5. Confirm validation enforced',
+                'expected': f'Format validation properly enforced for {entity}',
+                'test_data': f'Invalid and valid formats for {entity}',
+                'type': 'Validation',
+                'priority': 'High'
+            }
+        else:
+            return {
+                'steps': f'1. Enter invalid data for {entity}\n2. Verify validation error\n3. Enter valid data\n4. Verify system accepts\n5. Confirm validation enforced',
+                'expected': f'Validation properly enforced for {entity}',
+                'test_data': f'Invalid and valid data for {entity}',
+                'type': 'Validation',
+                'priority': 'High'
+            }
     
-    def _create_security_test(self, req, actions, entities):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
+    def _generate_security_test(self, action, entity, req_lower):
+        """Generate security test case"""
         return {
             'steps': f'1. Attempt SQL injection in {entity} field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling',
             'expected': f'{action.capitalize()} securely handles malicious {entity}',
@@ -424,25 +362,69 @@ class AIProcessor:
             'priority': 'High'
         }
     
-    def _create_error_handling_test(self, req, errors):
-        error = errors[0] if errors else 'System error'
-        return {
-            'steps': f'1. Trigger {error} condition\n2. Verify error message displayed\n3. Check error is user-friendly\n4. Verify system state not corrupted\n5. Confirm recovery possible',
-            'expected': f'{error} handled gracefully with clear message',
-            'test_data': f'Error condition: {error}',
-            'type': 'Error Handling',
-            'priority': 'High'
-        }
+    def _generate_functional_test(self, action, entity, conditions, req_lower):
+        """Generate functional test case"""
+        if 'restriction' in conditions or 'mandatory' in conditions:
+            if 'login' in req_lower or 'logged in' in req_lower:
+                return {
+                    'steps': f'1. Attempt {action} without login\n2. Verify system redirects to login\n3. Login with valid credentials\n4. Attempt {action} again\n5. Verify action succeeds after login',
+                    'expected': f'{action.capitalize()} respects all conditional requirements',
+                    'test_data': f'Condition met and not met scenarios for {entity}',
+                    'type': 'Functional',
+                    'priority': 'High'
+                }
+            elif 'available' in req_lower or 'stock' in req_lower:
+                return {
+                    'steps': f'1. Verify {entity} availability/stock status\n2. Attempt {action} when available\n3. Verify action succeeds\n4. Attempt {action} when unavailable/out of stock\n5. Verify action prevented with error message',
+                    'expected': f'{action.capitalize()} respects all conditional requirements',
+                    'test_data': f'Condition met and not met scenarios for {entity}',
+                    'type': 'Functional',
+                    'priority': 'High'
+                }
+            else:
+                return {
+                    'steps': f'1. Verify condition for {action}\n2. Test when condition is met\n3. Verify {action} allowed\n4. Test when condition not met\n5. Verify {action} prevented',
+                    'expected': f'{action.capitalize()} respects all conditional requirements',
+                    'test_data': f'Condition met and not met scenarios for {entity}',
+                    'type': 'Functional',
+                    'priority': 'High'
+                }
+        else:
+            return {
+                'steps': f'1. Verify functionality for {action}\n2. Test with valid {entity}\n3. Verify {action} works correctly\n4. Check all features enabled\n5. Confirm functionality complete',
+                'expected': f'{action.capitalize()} functionality works as expected',
+                'test_data': f'Valid {entity} for functional testing',
+                'type': 'Functional',
+                'priority': 'High'
+            }
     
-    def _create_edge_case_test(self, req, actions, entities, constraints):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
-        
+    def _generate_message_test(self, action, entity, messages, req_lower):
+        """Generate message test case"""
+        if messages:
+            msg = messages[0]
+            return {
+                'steps': f'1. Trigger condition for message: "{msg}"\n2. Verify exact message displayed\n3. Check message visibility\n4. Verify message formatting\n5. Confirm message clarity',
+                'expected': f'System displays exact message: "{msg}"',
+                'test_data': f'Message trigger: "{msg}"',
+                'type': 'Functional',
+                'priority': 'High'
+            }
+        else:
+            return {
+                'steps': f'1. Execute {action} operation\n2. Verify success/error message displayed\n3. Check message visibility\n4. Verify message formatting\n5. Confirm message clarity',
+                'expected': f'System displays appropriate message for {action}',
+                'test_data': f'Message display test data',
+                'type': 'Functional',
+                'priority': 'High'
+            }
+    
+    def _generate_edge_case_test(self, action, entity, constraints, req_lower):
+        """Generate edge case test case"""
         if 'uniqueness' in constraints:
             return {
-                'steps': f'1. Create {entity} with unique value\n2. Attempt to create duplicate\n3. Verify system prevents duplicate\n4. Check error message\n5. Confirm uniqueness enforced',
-                'expected': f'System prevents duplicate {entity}',
-                'test_data': f'Duplicate {entity} with same unique value',
+                'steps': f'1. {action.capitalize()} {entity} with unique identifier\n2. Attempt to {action} same {entity} again\n3. Verify system prevents duplicate\n4. Check error message\n5. Confirm uniqueness enforced',
+                'expected': f'System prevents duplicate {action} on same {entity}',
+                'test_data': f'Duplicate {action} attempt on {entity}',
                 'type': 'Edge Case',
                 'priority': 'High'
             }
@@ -455,20 +437,18 @@ class AIProcessor:
                 'priority': 'Medium'
             }
     
-    def _create_functional_test(self, req, actions, entities):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
+    def _generate_performance_test(self, action, entity, req_lower):
+        """Generate performance test case"""
         return {
-            'steps': f'1. Setup test environment\n2. Execute {action} operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow',
-            'expected': f'{action.capitalize()} operation functions correctly end-to-end',
-            'test_data': f'Complete {entity} workflow data',
-            'type': 'Functional',
-            'priority': 'High'
+            'steps': f'1. Execute {action} operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable',
+            'expected': f'{action.capitalize()} operation completes within acceptable time',
+            'test_data': f'{entity} with performance monitoring',
+            'type': 'Performance',
+            'priority': 'Medium'
         }
     
-    def _create_data_consistency_test(self, req, actions, entities):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
+    def _generate_data_consistency_test(self, action, entity, req_lower):
+        """Generate data consistency test case"""
         return {
             'steps': f'1. Execute {action} operation\n2. Verify {entity} data saved correctly\n3. Retrieve {entity} from system\n4. Compare original and retrieved data\n5. Confirm data consistency',
             'expected': f'{entity} data remains consistent after {action}',
@@ -477,16 +457,36 @@ class AIProcessor:
             'priority': 'High'
         }
     
-    def _create_performance_test(self, req, actions, entities):
-        action = actions[0] if actions else 'execute'
-        entity = entities[0] if entities else 'item'
-        return {
-            'steps': f'1. Execute {action} operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable',
-            'expected': f'{action.capitalize()} operation completes within acceptable time',
-            'test_data': f'{entity} with performance monitoring',
-            'type': 'Performance',
-            'priority': 'Medium'
-        }
+    def _select_primary_action(self, actions, req_lower):
+        """Select most relevant action based on requirement context"""
+        priority_actions = ['browse', 'filter', 'sort', 'search', 'add', 'remove', 'update', 'checkout', 'pay', 'purchase', 'cancel', 'borrow', 'return', 'view', 'display', 'mark', 'send', 'prevent', 'validate', 'verify', 'calculate', 'reduce', 'increase']
+        for action in priority_actions:
+            if action in actions:
+                return action
+        return actions[0] if actions else 'execute'
+    
+    def _select_primary_entity(self, entities, req_lower):
+        """Select most relevant entity based on requirement context"""
+        if 'calculate' in req_lower or 'total price' in req_lower or 'tax' in req_lower:
+            return 'order'
+        if 'maximum quantity' in req_lower or 'add 11th' in req_lower or 'exceed' in req_lower:
+            return 'product'
+        if 'shipping address' in req_lower or 'enter address' in req_lower:
+            return 'address'
+        if 'credit card' in req_lower or 'card number' in req_lower or '16 digit' in req_lower:
+            return 'card'
+        if 'email' in req_lower or 'email format' in req_lower:
+            return 'email'
+        if 'phone' in req_lower or 'phone number' in req_lower or '10 digit' in req_lower:
+            return 'phone'
+        if 'inventory' in req_lower or 'stock' in req_lower or 'reduce' in req_lower or 'increase' in req_lower:
+            return 'inventory'
+        
+        priority_entities = ['product', 'order', 'payment', 'cart', 'user', 'address', 'email', 'notification', 'book', 'account', 'form', 'inventory', 'stock', 'card', 'phone']
+        for entity in priority_entities:
+            if entity in entities:
+                return entity
+        return entities[0] if entities else 'item'
     
     def _generate_default_tests(self):
         return [
@@ -506,58 +506,3 @@ class AIProcessor:
                 ]
             }
         ]
-
-    def _is_non_functional_requirement(self, req):
-        """Detect if requirement is non-functional"""
-        non_func_keywords = ['performance', 'scalability', 'usability', 'reliability', 'availability', 'maintainability', 'security', 'response time', 'throughput', 'latency', 'load', 'stress', 'concurrent', 'user-friendly', 'intuitive', 'accessible', 'compliant', 'standard', 'robust', 'resilient', 'fault-tolerant', 'backup', 'recovery', 'disaster', 'high availability', 'uptime', 'sla']
-        return any(kw in req.lower() for kw in non_func_keywords)
-    
-    def _create_performance_requirement_test(self, req):
-        """Create test for performance requirements"""
-        return {
-            'steps': '1. Setup performance monitoring tools\\n2. Execute operation under normal load\\n3. Measure response time\\n4. Verify meets performance criteria\\n5. Document results',
-            'expected': 'Operation meets performance requirements',
-            'test_data': 'Performance test data with monitoring',
-            'type': 'Performance',
-            'priority': 'High'
-        }
-    
-    def _create_scalability_requirement_test(self, req):
-        """Create test for scalability requirements"""
-        return {
-            'steps': '1. Setup test environment with baseline load\\n2. Gradually increase load\\n3. Monitor system performance\\n4. Verify system scales appropriately\\n5. Identify breaking points',
-            'expected': 'System scales to handle increased load',
-            'test_data': 'Scalability test with increasing load',
-            'type': 'Scalability',
-            'priority': 'High'
-        }
-    
-    def _create_usability_requirement_test(self, req):
-        """Create test for usability requirements"""
-        return {
-            'steps': '1. Conduct user testing\\n2. Verify UI is intuitive\\n3. Check navigation is clear\\n4. Verify error messages are helpful\\n5. Confirm accessibility standards met',
-            'expected': 'System is user-friendly and accessible',
-            'test_data': 'User testing with diverse user groups',
-            'type': 'Usability',
-            'priority': 'Medium'
-        }
-    
-    def _create_reliability_requirement_test(self, req):
-        """Create test for reliability requirements"""
-        return {
-            'steps': '1. Run system for extended period\\n2. Monitor for failures\\n3. Test error recovery\\n4. Verify data integrity\\n5. Confirm system stability',
-            'expected': 'System operates reliably without failures',
-            'test_data': 'Long-running reliability test',
-            'type': 'Reliability',
-            'priority': 'High'
-        }
-    
-    def _create_availability_requirement_test(self, req):
-        """Create test for availability requirements"""
-        return {
-            'steps': '1. Monitor system uptime\\n2. Simulate component failures\\n3. Verify failover mechanisms\\n4. Check recovery time\\n5. Confirm availability targets met',
-            'expected': 'System meets availability requirements',
-            'test_data': 'Availability test with failure scenarios',
-            'type': 'Availability',
-            'priority': 'High'
-        }
