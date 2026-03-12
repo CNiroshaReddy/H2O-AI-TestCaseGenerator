@@ -48,9 +48,26 @@ body {
     max-width: 400px;
 }
 
+.login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.login-header .logo {
+    height: 150px;
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 10px;
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+}
+
 .login-box h1 {
     text-align: center;
-    margin-bottom: 30px;
+    margin: 0;
     color: var(--text-primary);
     font-size: 28px;
     font-weight: 700;
@@ -99,22 +116,31 @@ body {
 /* Buttons */
 .btn-primary, .btn-generate {
     width: 100%;
-    padding: 12px 24px;
+    padding: 14px 28px;
     background: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-primary:hover, .btn-generate:hover {
     background: var(--primary-dark);
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+}
+
+.btn-primary:focus, .btn-generate:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .btn-primary:active, .btn-generate:active {
@@ -126,6 +152,12 @@ body {
     cursor: not-allowed;
     box-shadow: var(--shadow-sm);
     transform: none;
+    opacity: 0.6;
+}
+
+.btn-generate:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
 }
 
 /* Upload Button - Green Accent */
@@ -184,12 +216,27 @@ body {
     border-bottom: 1px solid var(--border);
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.logo {
+    height: 80px;
+    width: auto;
+    object-fit: contain;
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+}}
+
 .header h1 {
     color: var(--primary);
     font-size: 24px;
-    flex: 1;
-    min-width: 250px;
     font-weight: 700;
+    margin: 0;
 }
 
 .btn-logout {
@@ -203,12 +250,22 @@ body {
     border: none;
     cursor: pointer;
     box-shadow: var(--shadow-sm);
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
 }
 
 .btn-logout:hover {
     background: #DC2626;
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+}
+
+.btn-logout:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 /* Container */
@@ -252,6 +309,11 @@ body {
 .tab-btn:hover {
     color: var(--primary);
     background: rgba(79, 70, 229, 0.05);
+}
+
+.tab-btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
 }
 
 .tab-btn.active {
@@ -444,9 +506,15 @@ body {
 /* Footer Action */
 .footer-action {
     margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+    padding: 30px 20px;
+    border-top: 2px solid var(--border);
     text-align: center;
+    background: var(--bg-light);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .footer-action p {
@@ -702,5 +770,507 @@ body {
     
     .action-buttons {
         gap: 10px;
+    }
+}
+
+
+/* Guide Section */
+.guide-section {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.guide-section h2 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.guide-section > p {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    font-size: 15px;
+}
+
+.guide-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.guide-card {
+    background: var(--bg-light);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.guide-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.guide-card h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.guide-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.guide-card li {
+    margin-bottom: 12px;
+    padding-left: 20px;
+    position: relative;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.guide-card li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.guide-card:nth-child(2) li:before {
+    content: "✗";
+    color: #EF4444;
+}
+
+.guide-card strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.template-example {
+    margin-bottom: 15px;
+}
+
+.template-example p {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.template-example p:first-child {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--primary);
+}
+
+.template-example p:last-child {
+    background: #f5f5f5;
+    padding: 12px;
+    border-left: 3px solid var(--primary);
+    border-radius: 4px;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .guide-section {
+        padding: 20px;
+    }
+    
+    .guide-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .guide-card {
+        padding: 15px;
+    }
+    
+    .guide-card h3 {
+        font-size: 16px;
+    }
+    
+    .guide-card li {
+        font-size: 13px;
+    }
+}
+
+
+/* Help Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 25px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.modal-close:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.guide-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.guide-tab-btn {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.guide-tab-btn:hover {
+    color: var(--primary);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.guide-tab-btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+}
+
+.guide-tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.guide-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.guide-tab-content.active {
+    display: block;
+}
+
+.guide-tab-content h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.guide-list {
+    list-style: none;
+    padding: 0;
+}
+
+.guide-list li {
+    margin-bottom: 15px;
+    padding-left: 25px;
+    position: relative;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.guide-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.guide-list.error-list li:before {
+    content: "✗";
+    color: #EF4444;
+}
+
+.guide-list strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.example-card {
+    background: var(--bg-light);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--primary);
+    transition: all 0.3s ease;
+}
+
+.example-card:hover {
+    box-shadow: var(--shadow-sm);
+    transform: translateX(5px);
+}
+
+.example-title {
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.example-text {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.checklist {
+    list-style: none;
+    padding: 0;
+}
+
+.checklist li {
+    margin-bottom: 12px;
+    padding: 10px 15px;
+    background: var(--bg-light);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.checklist li:hover {
+    background: rgba(79, 70, 229, 0.1);
+    transform: translateX(5px);
+}
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-help {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-help:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.btn-help:active {
+    transform: translateY(0);
+}
+
+.btn-help:focus {
+    outline: 2px solid #FFF;
+    outline-offset: 2px;
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        max-height: 90vh;
+    }
+    
+    .modal-header {
+        padding: 20px;
+    }
+    
+    .modal-header h2 {
+        font-size: 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .guide-tabs {
+        gap: 5px;
+    }
+    
+    .guide-tab-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .guide-tab-content h3 {
+        font-size: 16px;
+    }
+    
+    .guide-list li {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+    
+    .example-card {
+        padding: 12px;
+    }
+    
+    .example-title {
+        font-size: 13px;
+    }
+    
+    .example-text {
+        font-size: 13px;
+    }
+    
+    .checklist li {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 98%;
+        margin: 15% auto;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-header h2 {
+        font-size: 18px;
+    }
+    
+    .modal-close {
+        font-size: 28px;
+        width: 35px;
+        height: 35px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .guide-tabs {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .guide-tab-btn {
+        width: 100%;
+        text-align: left;
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .guide-list li {
+        font-size: 12px;
+        padding-left: 20px;
+    }
+    
+    .example-card {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .checklist li {
+        font-size: 12px;
+        padding: 8px 10px;
     }
 }

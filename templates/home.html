@@ -11,13 +11,94 @@
 </head>
 <body>
     <div class="header">
-        <h1>H2O AI Test Case Generator</h1>
-        <a href="/logout" class="btn-logout">Logout</a>
+        <div class="header-content">
+            <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="H2O Logo" class="logo">
+            <h1>H2O AI Test Case Generator</h1>
+        </div>
+        <div class="header-actions">
+            <button class="btn-help" onclick="openHelpModal()">? Help</button>
+            <a href="/logout" class="btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Requirement Writing Guide</h2>
+                <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="guide-tabs">
+                    <button class="guide-tab-btn active" onclick="switchGuideTab('dos')">✓ DO's</button>
+                    <button class="guide-tab-btn" onclick="switchGuideTab('donts')">✗ DON'Ts</button>
+                    <button class="guide-tab-btn" onclick="switchGuideTab('examples')">📋 Examples</button>
+                    <button class="guide-tab-btn" onclick="switchGuideTab('checklist')">🎯 Checklist</button>
+                </div>
+
+                <div id="dos-tab" class="guide-tab-content active">
+                    <h3>✓ DO's - Write Clear Requirements</h3>
+                    <ul class="guide-list">
+                        <li><strong>Use action verbs:</strong> "Users should be able to register", "System must validate email"</li>
+                        <li><strong>Be specific:</strong> "Password must contain 8+ characters, 1 uppercase, 1 number, 1 special character"</li>
+                        <li><strong>Include constraints:</strong> "Maximum 5 items per cart", "Minimum 10 characters"</li>
+                        <li><strong>Mention error cases:</strong> "If payment fails, display error message"</li>
+                        <li><strong>Use consistent format:</strong> Bullet points or numbered lists work best</li>
+                        <li><strong>Include validation rules:</strong> "Email must be unique and valid format"</li>
+                        <li><strong>Specify conditions:</strong> "Users can only login after email verification"</li>
+                        <li><strong>Mention business rules:</strong> "Generate confirmation number after successful order"</li>
+                    </ul>
+                </div>
+
+                <div id="donts-tab" class="guide-tab-content">
+                    <h3>✗ DON'Ts - Avoid These Mistakes</h3>
+                    <ul class="guide-list error-list">
+                        <li><strong>Avoid vague statements:</strong> "System should work properly"</li>
+                        <li><strong>Don't use ambiguous language:</strong> "User should be able to do something"</li>
+                        <li><strong>Avoid implicit assumptions:</strong> Assume nothing about domain knowledge</li>
+                        <li><strong>Don't mix multiple requirements:</strong> Keep one requirement per statement</li>
+                        <li><strong>Avoid generic descriptions:</strong> "The system should be good"</li>
+                        <li><strong>Don't skip validation rules:</strong> Always mention format/length requirements</li>
+                        <li><strong>Avoid unclear abbreviations:</strong> Use full terms</li>
+                    </ul>
+                </div>
+
+                <div id="examples-tab" class="guide-tab-content">
+                    <h3>📋 Template Examples</h3>
+                    <div class="example-card">
+                        <p class="example-title">✓ Functional Requirement:</p>
+                        <p class="example-text">"Users should be able to register for an account using their email address and password. The email address must be unique and follow valid email format. The password must contain at least 8 characters, including one uppercase letter, one number, and one special character."</p>
+                    </div>
+                    <div class="example-card">
+                        <p class="example-title">✓ Business Rule:</p>
+                        <p class="example-text">"After successful registration, users should receive a verification email containing a link to activate their account. Users should only be able to login after verifying their email address."</p>
+                    </div>
+                    <div class="example-card">
+                        <p class="example-title">✓ Error Scenario:</p>
+                        <p class="example-text">"If a user enters an incorrect password three times consecutively, the account should be temporarily locked for 10 minutes. After 10 minutes, the user should be able to attempt login again."</p>
+                    </div>
+                </div>
+
+                <div id="checklist-tab" class="guide-tab-content">
+                    <h3>🎯 Requirement Quality Checklist</h3>
+                    <ul class="checklist">
+                        <li>☐ Requirement has clear action verb (create, register, validate, etc.)</li>
+                        <li>☐ Requirement specifies what entity is affected (user, account, email, etc.)</li>
+                        <li>☐ Requirement includes validation rules or constraints</li>
+                        <li>☐ Requirement mentions error scenarios or edge cases</li>
+                        <li>☐ Requirement is not vague or ambiguous</li>
+                        <li>☐ Requirement is specific and measurable</li>
+                        <li>☐ Requirement is independent (not dependent on other requirements)</li>
+                        <li>☐ Requirement uses consistent terminology</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" data-tab="upload">Upload your docs</button>
+            <button class="tab-btn active" data-tab="upload">Upload your documents</button>
             <button class="tab-btn" data-tab="output">AI_TestOutput</button>
         </div>
 
@@ -72,5 +153,38 @@
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}?v=3.0"></script>
+    <script>
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'block';
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        function switchGuideTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.guide-tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from buttons
+            const buttons = document.querySelectorAll('.guide-tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('helpModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

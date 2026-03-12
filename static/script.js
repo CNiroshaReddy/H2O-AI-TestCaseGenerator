@@ -317,3 +317,152 @@ function downloadExcel() {
         alert('❌ Error downloading file: ' + error.message);
     }
 }
+
+
+// Keyboard Navigation
+document.addEventListener('keydown', function(event) {
+    // Escape key - Close modal
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('helpModal');
+        if (modal && modal.style.display === 'block') {
+            closeHelpModal();
+        }
+    }
+    
+    // Alt + H - Open Help
+    if (event.altKey && event.key === 'h') {
+        event.preventDefault();
+        openHelpModal();
+    }
+    
+    // Alt + L - Logout
+    if (event.altKey && event.key === 'l') {
+        event.preventDefault();
+        const logoutBtn = document.querySelector('.btn-logout');
+        if (logoutBtn) {
+            logoutBtn.click();
+        }
+    }
+    
+    // Alt + U - Upload
+    if (event.altKey && event.key === 'u') {
+        event.preventDefault();
+        const uploadBtn = document.querySelector('.btn-upload');
+        if (uploadBtn) {
+            uploadBtn.click();
+        }
+    }
+    
+    // Alt + G - Generate
+    if (event.altKey && event.key === 'g') {
+        event.preventDefault();
+        const generateBtn = document.getElementById('generateBtn');
+        if (generateBtn && !generateBtn.disabled) {
+            generateBtn.click();
+        }
+    }
+    
+    // Alt + V - View Results
+    if (event.altKey && event.key === 'v') {
+        event.preventDefault();
+        const viewBtn = Array.from(document.querySelectorAll('.btn-primary')).find(btn => btn.textContent.includes('View'));
+        if (viewBtn) {
+            viewBtn.click();
+        }
+    }
+    
+    // Alt + D - Download
+    if (event.altKey && event.key === 'd') {
+        event.preventDefault();
+        const downloadBtn = Array.from(document.querySelectorAll('.btn-primary')).find(btn => btn.textContent.includes('Download'));
+        if (downloadBtn) {
+            downloadBtn.click();
+        }
+    }
+    
+    // Arrow keys for tab navigation
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    if (tabButtons.length > 0) {
+        const activeTab = document.querySelector('.tab-btn.active');
+        let currentIndex = Array.from(tabButtons).indexOf(activeTab);
+        
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            currentIndex = (currentIndex + 1) % tabButtons.length;
+            tabButtons[currentIndex].click();
+            tabButtons[currentIndex].focus();
+        } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            currentIndex = (currentIndex - 1 + tabButtons.length) % tabButtons.length;
+            tabButtons[currentIndex].click();
+            tabButtons[currentIndex].focus();
+        }
+    }
+    
+    // Arrow keys for guide tabs in modal
+    const guideTabButtons = document.querySelectorAll('.guide-tab-btn');
+    if (guideTabButtons.length > 0 && document.getElementById('helpModal').style.display === 'block') {
+        const activeGuideTab = document.querySelector('.guide-tab-btn.active');
+        let currentGuideIndex = Array.from(guideTabButtons).indexOf(activeGuideTab);
+        
+        if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            currentGuideIndex = (currentGuideIndex + 1) % guideTabButtons.length;
+            guideTabButtons[currentGuideIndex].click();
+            guideTabButtons[currentGuideIndex].focus();
+        } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            currentGuideIndex = (currentGuideIndex - 1 + guideTabButtons.length) % guideTabButtons.length;
+            guideTabButtons[currentGuideIndex].click();
+            guideTabButtons[currentGuideIndex].focus();
+        }
+    }
+    
+    // Enter key for buttons
+    if (event.key === 'Enter') {
+        if (event.target.classList.contains('btn-primary') || 
+            event.target.classList.contains('btn-generate') ||
+            event.target.classList.contains('btn-upload') ||
+            event.target.classList.contains('btn-help') ||
+            event.target.classList.contains('btn-logout')) {
+            event.preventDefault();
+            event.target.click();
+        }
+    }
+});
+
+// Add keyboard hints to buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Add title attributes for keyboard shortcuts
+    const helpBtn = document.querySelector('.btn-help');
+    if (helpBtn) {
+        helpBtn.title = 'Help (Alt+H)';
+    }
+    
+    const logoutBtn = document.querySelector('.btn-logout');
+    if (logoutBtn) {
+        logoutBtn.title = 'Logout (Alt+L)';
+    }
+    
+    const uploadBtn = document.querySelector('.btn-upload');
+    if (uploadBtn) {
+        uploadBtn.title = 'Upload (Alt+U)';
+    }
+    
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+        generateBtn.title = 'Generate Test Cases (Alt+G)';
+    }
+    
+    // Add focus styles for better keyboard navigation visibility
+    document.querySelectorAll('button, a, input').forEach(element => {
+        element.addEventListener('focus', function() {
+            this.style.outline = '2px solid var(--primary)';
+            this.style.outlineOffset = '2px';
+        });
+        
+        element.addEventListener('blur', function() {
+            this.style.outline = 'none';
+        });
+    });
+});

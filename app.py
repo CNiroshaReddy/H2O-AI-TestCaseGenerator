@@ -19,8 +19,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Valid credentials
-VALID_USERNAME = 'ncharala'
-VALID_PASSWORD = 'Password1!'
+VALID_CREDENTIALS = {
+    'ncharala': 'Password1!',
+    'test': 'test'
+}
 
 @app.route('/')
 def index():
@@ -35,10 +37,10 @@ def login():
         username = data.get('username')
         password = data.get('password')
         
-        if username == VALID_USERNAME and password == VALID_PASSWORD:
+        if username in VALID_CREDENTIALS and VALID_CREDENTIALS[username] == password:
             session.permanent = True
             session['logged_in'] = True
-            print(f"User logged in successfully. Session ID: {session.get('_id', 'No ID')}")
+            print(f"User '{username}' logged in successfully. Session ID: {session.get('_id', 'No ID')}")
             return jsonify({'success': True})
         else:
             return jsonify({'success': False, 'message': 'Invalid credentials'})

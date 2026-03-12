@@ -1,388 +1,1051 @@
 [
   {
     "ts_id": "TS_01",
-    "scenario_desc": "Login with valid credentials - Positive Testing",
+    "scenario_desc": "Users should be able to register for an account by providing Full Name, Email Address, and Password.",
     "test_cases": [
       {
         "tc_id": "TC_01",
-        "steps": "1. Navigate to login page\n2. Enter valid registered email address\n3. Enter correct password\n4. Click Login button\n5. Verify redirect to dashboard",
-        "expected": "User successfully logs in and is redirected to personalized dashboard",
-        "test_data": "Email: user@example.com, Password: Test@123",
+        "steps": "1. Prepare valid user with all required data\n2. Execute register operation\n3. Verify system accepts input\n4. Confirm register completes successfully\n5. Verify success message and data saved",
+        "expected": "Register operation succeeds with valid user",
+        "test_data": "Valid user: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
         "tc_id": "TC_02",
-        "steps": "1. Navigate to login page\n2. Enter valid email\n3. Enter correct password\n4. Check \"Remember Me\" checkbox\n5. Click Login\n6. Close browser\n7. Reopen browser and access application",
-        "expected": "User remains logged in and session persists across browser sessions",
-        "test_data": "Email: user@example.com, Password: Test@123, Remember Me: Checked",
+        "steps": "1. Prepare invalid user\n2. Attempt register operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify register not executed",
+        "expected": "Register operation fails with error: Invalid input",
+        "test_data": "Invalid user: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
+      },
+      {
+        "tc_id": "TC_03",
+        "steps": "1. Test user with boundary values\n2. Execute register operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Register handles boundary values correctly",
+        "test_data": "user boundary test data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Boundary | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_04",
+        "steps": "1. Attempt SQL injection in user field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Register securely handles malicious user",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_05",
+        "steps": "1. Prepare user with special characters\n2. Execute register operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Register handles edge cases with user",
+        "test_data": "user with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_06",
+        "steps": "1. Setup test environment\n2. Execute register operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Register operation functions correctly end-to-end",
+        "test_data": "Complete user workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_07",
+        "steps": "1. Execute register operation\n2. Verify user data saved correctly\n3. Retrieve user from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "user data remains consistent after register",
+        "test_data": "user with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_08",
+        "steps": "1. Execute register operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Register operation completes within acceptable time",
+        "test_data": "user with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_02",
-    "scenario_desc": "Login with invalid credentials - Negative Testing",
+    "scenario_desc": "The system must validate the email address to ensure it follows a valid email format and is unique.",
     "test_cases": [
       {
-        "tc_id": "TC_03",
-        "steps": "1. Navigate to login page\n2. Enter valid email\n3. Enter incorrect password\n4. Click Login button\n5. Verify error message displayed",
-        "expected": "Login fails with error message \"Invalid email or password\"",
-        "test_data": "Email: user@example.com, Password: WrongPass123",
+        "tc_id": "TC_09",
+        "steps": "1. Prepare valid address with all required data\n2. Execute validate operation\n3. Verify system accepts input\n4. Confirm validate completes successfully\n5. Verify success message and data saved",
+        "expected": "Validate operation succeeds with valid address",
+        "test_data": "Valid address: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_04",
-        "steps": "1. Navigate to login page\n2. Enter unregistered email\n3. Enter any password\n4. Click Login button\n5. Verify error message",
-        "expected": "Login fails with error message \"Account not found\"",
-        "test_data": "Email: notregistered@example.com, Password: AnyPass123",
+        "tc_id": "TC_10",
+        "steps": "1. Prepare invalid address\n2. Attempt validate operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify validate not executed",
+        "expected": "Validate operation fails with error: Invalid input",
+        "test_data": "Invalid address: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_05",
-        "steps": "1. Navigate to login page\n2. Leave email field empty\n3. Enter password\n4. Click Login button\n5. Verify validation error",
-        "expected": "Validation error displayed: \"Email is required\"",
-        "test_data": "Email: (empty), Password: Test@123",
+        "tc_id": "TC_11",
+        "steps": "1. Test address with boundary values\n2. Execute validate operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Validate handles boundary values correctly",
+        "test_data": "address boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
       },
       {
-        "tc_id": "TC_06",
-        "steps": "1. Navigate to login page\n2. Enter email\n3. Leave password field empty\n4. Click Login button\n5. Verify validation error",
-        "expected": "Validation error displayed: \"Password is required\"",
-        "test_data": "Email: user@example.com, Password: (empty)",
+        "tc_id": "TC_12",
+        "steps": "1. Enter invalid data violating Valid email format\n2. Verify validation error\n3. Enter valid data meeting Valid email format\n4. Verify system accepts\n5. Confirm validation enforced",
+        "expected": "Valid email format is properly enforced",
+        "test_data": "Invalid: Non-compliant data, Valid: Compliant data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Validation | Priority: High"
       },
       {
-        "tc_id": "TC_07",
-        "steps": "1. Navigate to login page\n2. Leave both email and password empty\n3. Click Login button\n4. Verify validation errors for both fields",
-        "expected": "Validation errors displayed for both email and password fields",
-        "test_data": "Email: (empty), Password: (empty)",
+        "tc_id": "TC_13",
+        "steps": "1. Attempt SQL injection in address field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Validate securely handles malicious address",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_14",
+        "steps": "1. Create address with unique value\n2. Attempt to create duplicate\n3. Verify system prevents duplicate\n4. Check error message\n5. Confirm uniqueness enforced",
+        "expected": "System prevents duplicate address",
+        "test_data": "Duplicate address with same unique value",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: High"
+      },
+      {
+        "tc_id": "TC_15",
+        "steps": "1. Setup test environment\n2. Execute validate operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Validate operation functions correctly end-to-end",
+        "test_data": "Complete address workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_16",
+        "steps": "1. Execute validate operation\n2. Verify address data saved correctly\n3. Retrieve address from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "address data remains consistent after validate",
+        "test_data": "address with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_17",
+        "steps": "1. Execute validate operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Validate operation completes within acceptable time",
+        "test_data": "address with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_03",
-    "scenario_desc": "Login with boundary and edge case inputs",
+    "scenario_desc": "The password must contain at least 8 characters, including:\nAt least one uppercase letter\nAt least one number\nAt least one special character\nUsers should receive an email verification link after successful registration.",
     "test_cases": [
       {
-        "tc_id": "TC_08",
-        "steps": "1. Navigate to login page\n2. Enter email with maximum allowed length (254 characters)\n3. Enter valid password\n4. Click Login\n5. Verify system handles correctly",
-        "expected": "System accepts maximum length email and processes login correctly",
-        "test_data": "Email: very_long_email_address_with_254_characters@example.com, Password: Test@123",
+        "tc_id": "TC_18",
+        "steps": "1. Prepare valid password with all required data\n2. Execute receive operation\n3. Verify system accepts input\n4. Confirm receive completes successfully\n5. Verify success message and data saved",
+        "expected": "Receive operation succeeds with valid password",
+        "test_data": "Valid password: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_09",
-        "steps": "1. Navigate to login page\n2. Enter email with special characters\n3. Enter password\n4. Click Login\n5. Verify system handles special characters",
-        "expected": "System correctly processes email with special characters",
-        "test_data": "Email: user+test@example.com, Password: Test@123",
+        "tc_id": "TC_19",
+        "steps": "1. Prepare invalid password\n2. Attempt receive operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify receive not executed",
+        "expected": "Receive operation fails with error: Invalid input",
+        "test_data": "Invalid password: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_10",
-        "steps": "1. Navigate to login page\n2. Enter email with leading/trailing spaces\n3. Enter password\n4. Click Login\n5. Verify system trims spaces",
-        "expected": "System trims spaces and processes login correctly",
-        "test_data": "Email: \" user@example.com \", Password: Test@123",
+        "tc_id": "TC_20",
+        "steps": "1. Prepare password below minimum\n2. Attempt receive operation\n3. Verify system rejects\n4. Prepare password at minimum\n5. Verify system accepts",
+        "expected": "Receive rejects below minimum, accepts at minimum",
+        "test_data": "password at min boundary",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: High"
       },
       {
-        "tc_id": "TC_11",
-        "steps": "1. Navigate to login page\n2. Enter password with minimum length (8 characters)\n3. Verify acceptance\n4. Enter password with maximum length (128 characters)\n5. Verify acceptance",
-        "expected": "System accepts passwords within defined length boundaries",
-        "test_data": "Min: Test@123, Max: 128 character password",
+        "tc_id": "TC_21",
+        "steps": "1. Enter invalid data violating Minimum 8 characters\n2. Verify validation error\n3. Enter valid data meeting Minimum 8 characters\n4. Verify system accepts\n5. Confirm validation enforced",
+        "expected": "Minimum 8 characters is properly enforced",
+        "test_data": "Invalid: Non-compliant data, Valid: Compliant data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Validation | Priority: High"
+      },
+      {
+        "tc_id": "TC_22",
+        "steps": "1. Attempt SQL injection in password field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Receive securely handles malicious password",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_23",
+        "steps": "1. Prepare password with special characters\n2. Execute receive operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Receive handles edge cases with password",
+        "test_data": "password with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_24",
+        "steps": "1. Setup test environment\n2. Execute receive operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Receive operation functions correctly end-to-end",
+        "test_data": "Complete password workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_25",
+        "steps": "1. Execute receive operation\n2. Verify password data saved correctly\n3. Retrieve password from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "password data remains consistent after receive",
+        "test_data": "password with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_26",
+        "steps": "1. Execute receive operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Receive operation completes within acceptable time",
+        "test_data": "password with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_04",
-    "scenario_desc": "Login security and vulnerability testing",
+    "scenario_desc": "Users can only log in after completing email verification.",
     "test_cases": [
       {
-        "tc_id": "TC_12",
-        "steps": "1. Navigate to login page\n2. Enter SQL injection code in email field\n3. Enter password\n4. Click Login\n5. Verify system prevents SQL injection",
-        "expected": "System sanitizes input and prevents SQL injection attack, login fails safely",
-        "test_data": "Email: admin' OR '1'='1, Password: test",
+        "tc_id": "TC_27",
+        "steps": "1. Prepare valid user with all required data\n2. Execute execute operation\n3. Verify system accepts input\n4. Confirm execute completes successfully\n5. Verify success message and data saved",
+        "expected": "Execute operation succeeds with valid user",
+        "test_data": "Valid user: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_13",
-        "steps": "1. Navigate to login page\n2. Enter XSS script in email field\n3. Click Login\n4. Verify script is not executed\n5. Check output is escaped",
-        "expected": "System prevents XSS attack by escaping special characters",
-        "test_data": "Email: <script>alert(\"XSS\")</script>@test.com",
+        "tc_id": "TC_28",
+        "steps": "1. Prepare invalid user\n2. Attempt execute operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify execute not executed",
+        "expected": "Execute operation fails with error: Invalid input",
+        "test_data": "Invalid user: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_14",
-        "steps": "1. Enter wrong password 5 times consecutively\n2. Verify account lockout after 5 attempts\n3. Try to login with correct password\n4. Verify account is locked\n5. Check lockout duration",
-        "expected": "Account is locked after 5 failed attempts, displays lockout message with duration",
-        "test_data": "5 consecutive failed login attempts",
+        "tc_id": "TC_29",
+        "steps": "1. Test user with boundary values\n2. Execute execute operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Execute handles boundary values correctly",
+        "test_data": "user boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
       },
       {
-        "tc_id": "TC_15",
-        "steps": "1. Login successfully\n2. Copy session token/cookie\n3. Logout\n4. Try to use old session token to access protected page\n5. Verify access denied",
-        "expected": "Old session tokens are invalidated after logout, access is denied",
-        "test_data": "Session token from previous session",
+        "tc_id": "TC_30",
+        "steps": "1. Attempt SQL injection in user field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Execute securely handles malicious user",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Security | Priority: High"
       },
       {
-        "tc_id": "TC_16",
-        "steps": "1. Login successfully\n2. Remain idle for 30 minutes\n3. Try to perform any action\n4. Verify session timeout\n5. Check redirect to login page",
-        "expected": "Session expires after 30 minutes of inactivity, user is redirected to login",
-        "test_data": "Session timeout: 30 minutes",
+        "tc_id": "TC_31",
+        "steps": "1. Prepare user with special characters\n2. Execute execute operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Execute handles edge cases with user",
+        "test_data": "user with special characters/unicode",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Edge Case | Priority: Medium"
       },
       {
-        "tc_id": "TC_17",
-        "steps": "1. Open login page\n2. Check if page uses HTTPS protocol\n3. Verify SSL certificate is valid\n4. Check password field is masked\n5. Verify no sensitive data in URL",
-        "expected": "Login page uses HTTPS, SSL certificate valid, password masked, no data in URL",
-        "test_data": "Security protocol check",
+        "tc_id": "TC_32",
+        "steps": "1. Setup test environment\n2. Execute execute operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Execute operation functions correctly end-to-end",
+        "test_data": "Complete user workflow data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_33",
+        "steps": "1. Execute execute operation\n2. Verify user data saved correctly\n3. Retrieve user from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "user data remains consistent after execute",
+        "test_data": "user with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_34",
+        "steps": "1. Execute execute operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Execute operation completes within acceptable time",
+        "test_data": "user with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_05",
-    "scenario_desc": "Login UI/UX and responsive design testing",
+    "scenario_desc": "If users enter incorrect login credentials, the system must display the error message:\n\"Invalid email or password.\"\nIf a user enters incorrect credentials 3 consecutive times, the system should lock the account for 10 minutes.",
     "test_cases": [
       {
-        "tc_id": "TC_18",
-        "steps": "1. Open login page on desktop browser (1920x1080)\n2. Verify all elements are visible\n3. Check field alignment\n4. Verify button placement\n5. Test on different desktop resolutions",
-        "expected": "Login page displays correctly on desktop with proper layout and alignment",
-        "test_data": "Desktop resolutions: 1920x1080, 1366x768, 1280x720",
+        "tc_id": "TC_35",
+        "steps": "1. Prepare valid message with all required data\n2. Execute display operation\n3. Verify system accepts input\n4. Confirm display completes successfully\n5. Verify success message and data saved",
+        "expected": "Display operation succeeds with valid message",
+        "test_data": "Valid message: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_19",
-        "steps": "1. Open login page on mobile device (iPhone)\n2. Verify responsive layout\n3. Check touch-friendly buttons\n4. Test portrait and landscape modes\n5. Verify keyboard doesn't hide fields",
-        "expected": "Login page is fully responsive on mobile devices with touch-friendly interface",
-        "test_data": "Mobile devices: iPhone 12, Samsung Galaxy S21",
+        "tc_id": "TC_36",
+        "steps": "1. Prepare invalid message\n2. Attempt display operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify display not executed",
+        "expected": "Display operation fails with error: Account locked",
+        "test_data": "Invalid message: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_20",
-        "steps": "1. Open login page on tablet (iPad)\n2. Verify layout adapts to tablet size\n3. Test portrait and landscape\n4. Check touch interactions\n5. Verify all elements accessible",
-        "expected": "Login page works correctly on tablets with appropriate layout",
-        "test_data": "Tablets: iPad Pro, Samsung Galaxy Tab",
+        "tc_id": "TC_37",
+        "steps": "1. Prepare message below minimum\n2. Attempt display operation\n3. Verify system rejects\n4. Prepare message at minimum\n5. Verify system accepts",
+        "expected": "Display rejects below minimum, accepts at minimum",
+        "test_data": "message at min boundary",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: High"
       },
       {
-        "tc_id": "TC_21",
-        "steps": "1. Navigate to login page\n2. Verify password field shows masked characters (dots/asterisks)\n3. Click show/hide password icon\n4. Verify password becomes visible\n5. Click again to hide",
-        "expected": "Password masking works correctly with toggle functionality",
-        "test_data": "Password visibility toggle",
+        "tc_id": "TC_38",
+        "steps": "1. Enter invalid data violating Valid email format\n2. Verify validation error\n3. Enter valid data meeting Valid email format\n4. Verify system accepts\n5. Confirm validation enforced",
+        "expected": "Valid email format is properly enforced",
+        "test_data": "Invalid: Non-compliant data, Valid: Compliant data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Validation | Priority: High"
       },
       {
-        "tc_id": "TC_22",
-        "steps": "1. Open login page\n2. Use Tab key to navigate between fields\n3. Verify focus moves correctly (email → password → remember me → login button)\n4. Press Enter on login button\n5. Verify form submits",
-        "expected": "Keyboard navigation works correctly, Enter key submits form",
-        "test_data": "Keyboard navigation test",
+        "tc_id": "TC_39",
+        "steps": "1. Attempt SQL injection in message field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Display securely handles malicious message",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Security | Priority: High"
       },
       {
-        "tc_id": "TC_23",
-        "steps": "1. Open login page\n2. Verify email field has auto-focus\n3. Check placeholder text is visible\n4. Verify field labels are clear\n5. Check error messages are readable",
-        "expected": "UI elements are user-friendly with clear labels and helpful text",
-        "test_data": "UI/UX elements check",
+        "tc_id": "TC_40",
+        "steps": "1. Trigger Account locked condition\n2. Verify error message displayed\n3. Check error is user-friendly\n4. Verify system state not corrupted\n5. Confirm recovery possible",
+        "expected": "Account locked handled gracefully with clear message",
+        "test_data": "Error condition: Account locked",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Error Handling | Priority: High"
+      },
+      {
+        "tc_id": "TC_41",
+        "steps": "1. Prepare message with special characters\n2. Execute display operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Display handles edge cases with message",
+        "test_data": "message with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_42",
+        "steps": "1. Setup test environment\n2. Execute display operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Display operation functions correctly end-to-end",
+        "test_data": "Complete message workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_43",
+        "steps": "1. Execute display operation\n2. Verify message data saved correctly\n3. Retrieve message from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "message data remains consistent after display",
+        "test_data": "message with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_44",
+        "steps": "1. Execute display operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Display operation completes within acceptable time",
+        "test_data": "message with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_06",
-    "scenario_desc": "Login performance and load testing",
+    "scenario_desc": "Course Browsing\nUsers should be able to view available courses on the dashboard.",
     "test_cases": [
       {
-        "tc_id": "TC_24",
-        "steps": "1. Navigate to login page\n2. Enter credentials\n3. Click Login\n4. Measure time from click to dashboard load\n5. Verify response time is under 2 seconds",
-        "expected": "Login completes within 2 seconds under normal load",
-        "test_data": "Performance benchmark: < 2 seconds",
+        "tc_id": "TC_45",
+        "steps": "1. Prepare valid user with all required data\n2. Execute view operation\n3. Verify system accepts input\n4. Confirm view completes successfully\n5. Verify success message and data saved",
+        "expected": "View operation succeeds with valid user",
+        "test_data": "Valid user: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_25",
-        "steps": "1. Simulate 100 concurrent users logging in\n2. Measure response times\n3. Check for errors\n4. Verify all logins complete successfully\n5. Monitor server resources",
-        "expected": "System handles 100 concurrent logins without performance degradation",
-        "test_data": "100 concurrent users",
+        "tc_id": "TC_46",
+        "steps": "1. Prepare invalid user\n2. Attempt view operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify view not executed",
+        "expected": "View operation fails with error: Invalid input",
+        "test_data": "Invalid user: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_26",
-        "steps": "1. Simulate 1000 concurrent users\n2. Measure response times\n3. Check error rates\n4. Monitor CPU and memory usage\n5. Verify system stability",
-        "expected": "System remains stable under load of 1000 concurrent users",
-        "test_data": "1000 concurrent users",
+        "tc_id": "TC_47",
+        "steps": "1. Test user with boundary values\n2. Execute view operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "View handles boundary values correctly",
+        "test_data": "user boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
       },
       {
-        "tc_id": "TC_27",
-        "steps": "1. Measure login page load time\n2. Check time to first byte (TTFB)\n3. Measure DOM content loaded time\n4. Verify page fully loads in under 3 seconds\n5. Test on different network speeds",
-        "expected": "Login page loads completely within 3 seconds on standard network",
-        "test_data": "Network speeds: 4G, 3G, WiFi",
+        "tc_id": "TC_48",
+        "steps": "1. Attempt SQL injection in user field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "View securely handles malicious user",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_49",
+        "steps": "1. Prepare user with special characters\n2. Execute view operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "View handles edge cases with user",
+        "test_data": "user with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_50",
+        "steps": "1. Setup test environment\n2. Execute view operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "View operation functions correctly end-to-end",
+        "test_data": "Complete user workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_51",
+        "steps": "1. Execute view operation\n2. Verify user data saved correctly\n3. Retrieve user from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "user data remains consistent after view",
+        "test_data": "user with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_52",
+        "steps": "1. Execute view operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "View operation completes within acceptable time",
+        "test_data": "user with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_07",
-    "scenario_desc": "Login integration with other systems",
+    "scenario_desc": "Each course should display:\nCourse Name\nInstructor Name\nCourse Duration\nAvailable Seats\nUsers should be able to enroll in a course if seats are available.",
     "test_cases": [
       {
-        "tc_id": "TC_28",
-        "steps": "1. Login successfully\n2. Verify session is created in database\n3. Check user data is retrieved correctly\n4. Verify dashboard loads with user-specific data\n5. Check all integrated services are accessible",
-        "expected": "Login integrates correctly with database and all dependent services",
-        "test_data": "Database and service integration",
+        "tc_id": "TC_53",
+        "steps": "1. Prepare valid seat with all required data\n2. Execute display operation\n3. Verify system accepts input\n4. Confirm display completes successfully\n5. Verify success message and data saved",
+        "expected": "Display operation succeeds with valid seat",
+        "test_data": "Valid seat: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_29",
-        "steps": "1. Simulate database connection failure\n2. Attempt to login\n3. Verify graceful error handling\n4. Check appropriate error message displayed\n5. Verify system doesn't crash",
-        "expected": "System handles database failures gracefully with user-friendly error message",
-        "test_data": "Database connection failure simulation",
+        "tc_id": "TC_54",
+        "steps": "1. Prepare invalid seat\n2. Attempt display operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify display not executed",
+        "expected": "Display operation fails with error: Invalid input",
+        "test_data": "Invalid seat: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_30",
-        "steps": "1. Login from one browser\n2. Login from another browser with same credentials\n3. Verify concurrent session handling\n4. Check if previous session is invalidated or both allowed\n5. Verify session management policy",
-        "expected": "System handles concurrent sessions according to defined policy",
-        "test_data": "Multiple concurrent sessions",
+        "tc_id": "TC_55",
+        "steps": "1. Test seat with boundary values\n2. Execute display operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Display handles boundary values correctly",
+        "test_data": "seat boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_56",
+        "steps": "1. Attempt SQL injection in seat field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Display securely handles malicious seat",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_57",
+        "steps": "1. Prepare seat with special characters\n2. Execute display operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Display handles edge cases with seat",
+        "test_data": "seat with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_58",
+        "steps": "1. Setup test environment\n2. Execute display operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Display operation functions correctly end-to-end",
+        "test_data": "Complete seat workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_59",
+        "steps": "1. Execute display operation\n2. Verify seat data saved correctly\n3. Retrieve seat from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "seat data remains consistent after display",
+        "test_data": "seat with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_60",
+        "steps": "1. Execute display operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Display operation completes within acceptable time",
+        "test_data": "seat with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_08",
-    "scenario_desc": "Login error handling and recovery",
+    "scenario_desc": "Users should not be able to enroll in a course if available seats are zero.",
     "test_cases": [
       {
-        "tc_id": "TC_31",
-        "steps": "1. Disconnect network\n2. Attempt to login\n3. Verify network error is caught\n4. Check error message is displayed\n5. Reconnect and retry",
-        "expected": "System displays clear network error message and allows retry after reconnection",
-        "test_data": "Network disconnection scenario",
+        "tc_id": "TC_61",
+        "steps": "1. Prepare valid seat with all required data\n2. Execute execute operation\n3. Verify system accepts input\n4. Confirm execute completes successfully\n5. Verify success message and data saved",
+        "expected": "Execute operation succeeds with valid seat",
+        "test_data": "Valid seat: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_32",
-        "steps": "1. Enter valid credentials\n2. Simulate server timeout during authentication\n3. Verify timeout is handled\n4. Check appropriate message displayed\n5. Verify user can retry",
-        "expected": "System handles server timeout gracefully with retry option",
-        "test_data": "Server timeout: 30 seconds",
+        "tc_id": "TC_62",
+        "steps": "1. Prepare invalid seat\n2. Attempt execute operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify execute not executed",
+        "expected": "Execute operation fails with error: Invalid input",
+        "test_data": "Invalid seat: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_33",
-        "steps": "1. Enter credentials\n2. Simulate 500 Internal Server Error\n3. Verify error is caught\n4. Check user-friendly error message\n5. Verify system doesn't expose technical details",
-        "expected": "System displays generic error message without exposing technical details",
-        "test_data": "500 Internal Server Error",
+        "tc_id": "TC_63",
+        "steps": "1. Test seat with boundary values\n2. Execute execute operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Execute handles boundary values correctly",
+        "test_data": "seat boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
       },
       {
-        "tc_id": "TC_34",
-        "steps": "1. Login with locked account\n2. Verify lockout message is displayed\n3. Check lockout duration is shown\n4. Verify contact support option available\n5. Test account unlock after duration",
-        "expected": "Clear lockout message with duration and support contact information",
-        "test_data": "Locked account scenario",
+        "tc_id": "TC_64",
+        "steps": "1. Attempt SQL injection in seat field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Execute securely handles malicious seat",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_65",
+        "steps": "1. Prepare seat with special characters\n2. Execute execute operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Execute handles edge cases with seat",
+        "test_data": "seat with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_66",
+        "steps": "1. Setup test environment\n2. Execute execute operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Execute operation functions correctly end-to-end",
+        "test_data": "Complete seat workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_67",
+        "steps": "1. Execute execute operation\n2. Verify seat data saved correctly\n3. Retrieve seat from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "seat data remains consistent after execute",
+        "test_data": "seat with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_68",
+        "steps": "1. Execute execute operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Execute operation completes within acceptable time",
+        "test_data": "seat with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   },
   {
     "ts_id": "TS_09",
-    "scenario_desc": "Input validation and error handling",
+    "scenario_desc": "The system should display the message \"Course is full\" if no seats are available.",
     "test_cases": [
       {
-        "tc_id": "TC_35",
-        "steps": "1. Navigate to form page\n2. Enter invalid data in various fields (wrong format, special chars)\n3. Click submit button\n4. Verify validation messages appear\n5. Check field highlighting\n6. Verify form is not submitted",
-        "expected": "System validates all fields, displays clear error messages, and highlights invalid fields",
-        "test_data": "Invalid email: notanemail, Invalid phone: abc123",
+        "tc_id": "TC_69",
+        "steps": "1. Prepare valid seat with all required data\n2. Execute display operation\n3. Verify system accepts input\n4. Confirm display completes successfully\n5. Verify success message and data saved",
+        "expected": "Display operation succeeds with valid seat",
+        "test_data": "Valid seat: Complete and correct data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Positive | Priority: High"
       },
       {
-        "tc_id": "TC_36",
-        "steps": "1. Open form\n2. Test field constraints (min/max length, numeric range)\n3. Enter values exceeding limits\n4. Verify real-time validation\n5. Check error message clarity",
-        "expected": "Field constraints are enforced, validation occurs in real-time, and clear messages guide user",
-        "test_data": "Text exceeding max length, Number outside range",
+        "tc_id": "TC_70",
+        "steps": "1. Prepare invalid seat\n2. Attempt display operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify display not executed",
+        "expected": "Display operation fails with error: Invalid input",
+        "test_data": "Invalid seat: Missing or incorrect data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Negative | Priority: High"
       },
       {
-        "tc_id": "TC_37",
-        "steps": "1. Fill form with valid data after seeing errors\n2. Verify error messages disappear\n3. Submit form\n4. Verify successful submission",
-        "expected": "Error messages clear when valid data is entered and form submits successfully",
-        "test_data": "Corrected valid data",
+        "tc_id": "TC_71",
+        "steps": "1. Test seat with boundary values\n2. Execute display operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Display handles boundary values correctly",
+        "test_data": "seat boundary test data",
         "results": "",
         "defects": "",
-        "comments": ""
+        "comments": "Type: Boundary | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_72",
+        "steps": "1. Attempt SQL injection in seat field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Display securely handles malicious seat",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_73",
+        "steps": "1. Prepare seat with special characters\n2. Execute display operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Display handles edge cases with seat",
+        "test_data": "seat with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_74",
+        "steps": "1. Setup test environment\n2. Execute display operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Display operation functions correctly end-to-end",
+        "test_data": "Complete seat workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_75",
+        "steps": "1. Execute display operation\n2. Verify seat data saved correctly\n3. Retrieve seat from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "seat data remains consistent after display",
+        "test_data": "seat with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_76",
+        "steps": "1. Execute display operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Display operation completes within acceptable time",
+        "test_data": "seat with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
+      }
+    ]
+  },
+  {
+    "ts_id": "TS_10",
+    "scenario_desc": "Enrollment Rules\nUsers should not be able to enroll in more than 5 courses simultaneously.",
+    "test_cases": [
+      {
+        "tc_id": "TC_77",
+        "steps": "1. Prepare valid user with all required data\n2. Execute execute operation\n3. Verify system accepts input\n4. Confirm execute completes successfully\n5. Verify success message and data saved",
+        "expected": "Execute operation succeeds with valid user",
+        "test_data": "Valid user: Complete and correct data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Positive | Priority: High"
+      },
+      {
+        "tc_id": "TC_78",
+        "steps": "1. Prepare invalid user\n2. Attempt execute operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify execute not executed",
+        "expected": "Execute operation fails with error: Invalid input",
+        "test_data": "Invalid user: Missing or incorrect data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Negative | Priority: High"
+      },
+      {
+        "tc_id": "TC_79",
+        "steps": "1. Prepare user at maximum allowed value\n2. Execute execute operation\n3. Verify system accepts maximum\n4. Prepare user exceeding maximum\n5. Verify system rejects excess",
+        "expected": "Execute accepts maximum but rejects excess",
+        "test_data": "user at max boundary and beyond",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Boundary | Priority: High"
+      },
+      {
+        "tc_id": "TC_80",
+        "steps": "1. Attempt SQL injection in user field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Execute securely handles malicious user",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_81",
+        "steps": "1. Prepare user with special characters\n2. Execute execute operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Execute handles edge cases with user",
+        "test_data": "user with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_82",
+        "steps": "1. Setup test environment\n2. Execute execute operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Execute operation functions correctly end-to-end",
+        "test_data": "Complete user workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_83",
+        "steps": "1. Execute execute operation\n2. Verify user data saved correctly\n3. Retrieve user from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "user data remains consistent after execute",
+        "test_data": "user with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_84",
+        "steps": "1. Execute execute operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Execute operation completes within acceptable time",
+        "test_data": "user with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
+      }
+    ]
+  },
+  {
+    "ts_id": "TS_11",
+    "scenario_desc": "Users should not be able to enroll in the same course more than once.",
+    "test_cases": [
+      {
+        "tc_id": "TC_85",
+        "steps": "1. Prepare valid user with all required data\n2. Execute execute operation\n3. Verify system accepts input\n4. Confirm execute completes successfully\n5. Verify success message and data saved",
+        "expected": "Execute operation succeeds with valid user",
+        "test_data": "Valid user: Complete and correct data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Positive | Priority: High"
+      },
+      {
+        "tc_id": "TC_86",
+        "steps": "1. Prepare invalid user\n2. Attempt execute operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify execute not executed",
+        "expected": "Execute operation fails with error: Invalid input",
+        "test_data": "Invalid user: Missing or incorrect data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Negative | Priority: High"
+      },
+      {
+        "tc_id": "TC_87",
+        "steps": "1. Prepare user at maximum allowed value\n2. Execute execute operation\n3. Verify system accepts maximum\n4. Prepare user exceeding maximum\n5. Verify system rejects excess",
+        "expected": "Execute accepts maximum but rejects excess",
+        "test_data": "user at max boundary and beyond",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Boundary | Priority: High"
+      },
+      {
+        "tc_id": "TC_88",
+        "steps": "1. Attempt SQL injection in user field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Execute securely handles malicious user",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_89",
+        "steps": "1. Prepare user with special characters\n2. Execute execute operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Execute handles edge cases with user",
+        "test_data": "user with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_90",
+        "steps": "1. Setup test environment\n2. Execute execute operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Execute operation functions correctly end-to-end",
+        "test_data": "Complete user workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_91",
+        "steps": "1. Execute execute operation\n2. Verify user data saved correctly\n3. Retrieve user from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "user data remains consistent after execute",
+        "test_data": "user with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_92",
+        "steps": "1. Execute execute operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Execute operation completes within acceptable time",
+        "test_data": "user with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
+      }
+    ]
+  },
+  {
+    "ts_id": "TS_12",
+    "scenario_desc": "If enrollment is successful, the system must:\nGenerate a unique enrollment confirmation number\nDisplay enrollment success message\nSend confirmation email to the user\n\nError Handling\nIf the enrollment process fails due to system error, the system must display the message:\n\"Enrollment failed.",
+    "test_cases": [
+      {
+        "tc_id": "TC_93",
+        "steps": "1. Prepare valid message with all required data\n2. Execute display operation\n3. Verify system accepts input\n4. Confirm display completes successfully\n5. Verify success message and data saved",
+        "expected": "Display operation succeeds with valid message",
+        "test_data": "Valid message: Complete and correct data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Positive | Priority: High"
+      },
+      {
+        "tc_id": "TC_94",
+        "steps": "1. Prepare invalid message\n2. Attempt display operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify display not executed",
+        "expected": "Display operation fails with error: Invalid input",
+        "test_data": "Invalid message: Missing or incorrect data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Negative | Priority: High"
+      },
+      {
+        "tc_id": "TC_95",
+        "steps": "1. Test message with boundary values\n2. Execute display operation\n3. Verify system handles boundaries\n4. Check edge values\n5. Confirm proper handling",
+        "expected": "Display handles boundary values correctly",
+        "test_data": "message boundary test data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Boundary | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_96",
+        "steps": "1. Enter invalid data violating Email must be unique\n2. Verify validation error\n3. Enter valid data meeting Email must be unique\n4. Verify system accepts\n5. Confirm validation enforced",
+        "expected": "Email must be unique is properly enforced",
+        "test_data": "Invalid: Non-compliant data, Valid: Compliant data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Validation | Priority: High"
+      },
+      {
+        "tc_id": "TC_97",
+        "steps": "1. Attempt SQL injection in message field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Display securely handles malicious message",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_98",
+        "steps": "1. Create message with unique value\n2. Attempt to create duplicate\n3. Verify system prevents duplicate\n4. Check error message\n5. Confirm uniqueness enforced",
+        "expected": "System prevents duplicate message",
+        "test_data": "Duplicate message with same unique value",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: High"
+      },
+      {
+        "tc_id": "TC_99",
+        "steps": "1. Setup test environment\n2. Execute display operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Display operation functions correctly end-to-end",
+        "test_data": "Complete message workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_100",
+        "steps": "1. Execute display operation\n2. Verify message data saved correctly\n3. Retrieve message from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "message data remains consistent after display",
+        "test_data": "message with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_101",
+        "steps": "1. Execute display operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Display operation completes within acceptable time",
+        "test_data": "message with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
+      }
+    ]
+  },
+  {
+    "ts_id": "TS_13",
+    "scenario_desc": "Please try again later.\"\nIf a user attempts to enroll in a course after the registration deadline, the system should display:\n\"Course enrollment is closed.\"",
+    "test_cases": [
+      {
+        "tc_id": "TC_102",
+        "steps": "1. Prepare valid registration with all required data\n2. Execute display operation\n3. Verify system accepts input\n4. Confirm display completes successfully\n5. Verify success message and data saved",
+        "expected": "Display operation succeeds with valid registration",
+        "test_data": "Valid registration: Complete and correct data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Positive | Priority: High"
+      },
+      {
+        "tc_id": "TC_103",
+        "steps": "1. Prepare invalid registration\n2. Attempt display operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify display not executed",
+        "expected": "Display operation fails with error: Invalid input",
+        "test_data": "Invalid registration: Missing or incorrect data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Negative | Priority: High"
+      },
+      {
+        "tc_id": "TC_104",
+        "steps": "1. Attempt SQL injection in registration field\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling",
+        "expected": "Display securely handles malicious registration",
+        "test_data": "Malicious: SQL injection, XSS, command injection attempts",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Security | Priority: High"
+      },
+      {
+        "tc_id": "TC_105",
+        "steps": "1. Prepare registration with special characters\n2. Execute display operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling",
+        "expected": "Display handles edge cases with registration",
+        "test_data": "registration with special characters/unicode",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Edge Case | Priority: Medium"
+      },
+      {
+        "tc_id": "TC_106",
+        "steps": "1. Setup test environment\n2. Execute display operation\n3. Verify all system components respond\n4. Check data consistency\n5. Validate complete workflow",
+        "expected": "Display operation functions correctly end-to-end",
+        "test_data": "Complete registration workflow data",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Functional | Priority: High"
+      },
+      {
+        "tc_id": "TC_107",
+        "steps": "1. Execute display operation\n2. Verify registration data saved correctly\n3. Retrieve registration from system\n4. Compare original and retrieved data\n5. Confirm data consistency",
+        "expected": "registration data remains consistent after display",
+        "test_data": "registration with various data types",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Data Consistency | Priority: High"
+      },
+      {
+        "tc_id": "TC_108",
+        "steps": "1. Execute display operation\n2. Measure response time\n3. Verify response within acceptable time\n4. Test with multiple concurrent requests\n5. Confirm performance acceptable",
+        "expected": "Display operation completes within acceptable time",
+        "test_data": "registration with performance monitoring",
+        "results": "",
+        "defects": "",
+        "comments": "Type: Performance | Priority: Medium"
       }
     ]
   }

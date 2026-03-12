@@ -561,3 +561,95 @@ Starting test case generation...
 === Analyzing content (52 characters) ===
 Features extracted: 9
 Generated 9 test scenarios with 37 test cases
+
+============================================================
+AI PROCESSOR - PROCESS_DOCUMENTS CALLED!
+============================================================
+Files to process: 1
+URLs to process: 0
+
+Extracting content from file: Requirement.docx
+Extracted 52 characters from Requirement.docx
+Content preview: Login application with valid and invalid credentials
+
+Total combined content: 52 characters
+Combined content preview:
+Login application with valid and invalid credentials
+Starting test case generation...
+
+=== Analyzing content (52 characters) ===
+Features extracted: 9
+Generated 9 test scenarios with 37 test cases
+
+============================================================
+AI PROCESSOR - PROCESS_DOCUMENTS CALLED!
+============================================================
+Files to process: 1
+URLs to process: 0
+
+Extracting content from file: New_DOC_Document.docx
+Extracted 865 characters from New_DOC_Document.docx
+Content preview: System Name: Online Banking Portal
+Functional Requirements:
+
+The system should allow users to login using Username and Password.
+
+
+The system should validate the credentials with the database.
+
+
+If cr
+
+Total combined content: 865 characters
+Combined content preview:
+System Name: Online Banking Portal
+Functional Requirements:
+
+The system should allow users to login using Username and Password.
+
+
+The system should validate the credentials with the database.
+
+
+If credentials are valid, the user should be redirected to the Dashboard page.
+
+
+If credentials are invalid, an error message "Invalid Username or Password" should be displayed.
+
+
+After 3 consecutive failed login attempts, the user account should be temporarily locked for 15 minutes.
+
+
+The login page sho
+Starting test case generation...
+
+=== Analyzing content (865 characters) ===
+Features extracted: 11
+Generated 11 test scenarios with 44 test cases
+
+============================================================
+AI PROCESSOR - PROCESS_DOCUMENTS CALLED!
+============================================================
+Files to process: 1
+URLs to process: 0
+
+Extracting content from file: SampleRequirement1.docx
+Extracted 613 characters from SampleRequirement1.docx
+Content preview: ·  The system should allow users to login using username and password.
+·  ·  If credentials are valid, the user should be redirected to the dashboard page.
+·  ·  If credentials are invalid, the system
+
+Total combined content: 613 characters
+Combined content preview:
+·  The system should allow users to login using username and password.
+·  ·  If credentials are valid, the user should be redirected to the dashboard page.
+·  ·  If credentials are invalid, the system should display an error message "Invalid credentials".
+·  ·  After 3 failed login attempts, the account should be locked for 10 minutes.
+·  ·  The login page should contain a "Forgot Password" link.
+·  ·  Users should be able to reset their password using their registered email address.
+·  ·  Passw
+Starting test case generation...
+
+=== Analyzing content (613 characters) ===
+Features extracted: 12
+Generated 12 test scenarios with 49 test cases
