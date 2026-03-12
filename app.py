@@ -5,18 +5,24 @@ from ai_processor import AIProcessor
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 import json
+import tempfile
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'h2o-ai-test-generator-secret-key'
-app.config['UPLOAD_FOLDER'] = 'uploads'
+
+# Use temp directory for production (Render)
+if os.environ.get('RENDER'):
+    app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
+else:
+    app.config['UPLOAD_FOLDER'] = 'uploads'
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour
-
-# Create upload folder
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Valid credentials
 VALID_CREDENTIALS = {
@@ -68,44 +74,49 @@ def upload():
     if 'logged_in' not in session:
         return jsonify({'success': False, 'message': 'Not authenticated'})
     
-    files = request.files.getlist('files')
-    urls = request.form.getlist('urls')
-    
-    print(f"\n=== Upload Request ===")
-    print(f"Files received: {len(files)}")
-    for f in files:
-        if f and f.filename:
-            print(f"  - {f.filename}")
-    print(f"URLs received: {urls}")
-    
-    if not files and not urls:
-        return jsonify({'success': False, 'message': 'No files or URLs provided'})
-    
-    uploaded_files = []
-    
-    # Save uploaded files
-    for file in files:
-        if file and file.filename:
-            filename = secure_filename(file.filename)
-            file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
-            
-            if file_ext not in ['doc', 'docx', 'pdf', 'txt']:
-                continue
-            
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            uploaded_files.append({
-                'path': filepath,
-                'type': file_ext,
-                'name': filename
-            })
-    
-    # Filter valid URLs
-    valid_urls = [u.strip() for u in urls if u and u.strip()]
-    print(f"Valid URLs to process: {valid_urls}")
-    
-    # Process with AI
     try:
+        files = request.files.getlist('files')
+        urls = request.form.getlist('urls')
+        
+        print(f"\n=== Upload Request ===")
+        print(f"Files received: {len(files)}")
+        for f in files:
+            if f and f.filename:
+                print(f"  - {f.filename}")
+        print(f"URLs received: {urls}")
+        
+        if not files and not urls:
+            return jsonify({'success': False, 'message': 'No files or URLs provided'})
+        
+        uploaded_files = []
+        
+        # Save uploaded files
+        for file in files:
+            if file and file.filename:
+                try:
+                    filename = secure_filename(file.filename)
+                    file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+                    
+                    if file_ext not in ['doc', 'docx', 'pdf', 'txt']:
+                        continue
+                    
+                    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    file.save(filepath)
+                    uploaded_files.append({
+                        'path': filepath,
+                        'type': file_ext,
+                        'name': filename
+                    })
+                    print(f"Saved file: {filepath}")
+                except Exception as fe:
+                    print(f"Error saving file {file.filename}: {str(fe)}")
+                    continue
+        
+        # Filter valid URLs
+        valid_urls = [u.strip() for u in urls if u and u.strip()]
+        print(f"Valid URLs to process: {valid_urls}")
+        
+        # Process with AI
         processor = AIProcessor()
         test_results = processor.process_documents(uploaded_files, valid_urls)
         
@@ -113,16 +124,11 @@ def upload():
         print(f"Generated {len(test_results)} test scenarios")
         
         if test_results and len(test_results) > 0:
-            # Store results in both session and file
+            # Store results in session
             session['test_results'] = test_results
             session.modified = True
             
-            # Also save to file as backup
-            results_file = os.path.join(app.config['UPLOAD_FOLDER'], 'latest_results.json')
-            with open(results_file, 'w', encoding='utf-8') as f:
-                json.dump(test_results, f, ensure_ascii=False, indent=2)
-            
-            print(f"Stored {len(test_results)} scenarios in session and file")
+            print(f"Stored {len(test_results)} scenarios in session")
             print(f"Session ID: {session.get('_id', 'No ID')}")
             
             return jsonify({'success': True, 'results': test_results})
@@ -140,19 +146,8 @@ def get_results():
     if 'logged_in' not in session:
         return jsonify({'success': False, 'message': 'Not authenticated'})
     
-    # Try to get from session first
+    # Get from session
     results = session.get('test_results', [])
-    
-    # If not in session, try to load from file
-    if not results or len(results) == 0:
-        results_file = os.path.join(app.config['UPLOAD_FOLDER'], 'latest_results.json')
-        if os.path.exists(results_file):
-            try:
-                with open(results_file, 'r', encoding='utf-8') as f:
-                    results = json.load(f)
-                print(f"Loaded {len(results)} scenarios from file")
-            except:
-                results = []
     
     print(f"\n=== Get Results ===")
     print(f"Results found: {len(results)} scenarios")
@@ -167,20 +162,8 @@ def download_excel():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
     
-    # Try to get from session first
+    # Get from session
     results = session.get('test_results', [])
-    
-    # If not in session, try to load from file
-    if not results or len(results) == 0:
-        results_file = os.path.join(app.config['UPLOAD_FOLDER'], 'latest_results.json')
-        if os.path.exists(results_file):
-            try:
-                with open(results_file, 'r', encoding='utf-8') as f:
-                    results = json.load(f)
-                print(f"Loaded {len(results)} scenarios from file for download")
-            except Exception as e:
-                print(f"Error loading results from file: {str(e)}")
-                results = []
     
     print(f"\n=== Download Excel ===")
     print(f"Results available: {len(results) if results else 0} scenarios")
@@ -240,7 +223,6 @@ def download_excel():
     ws.column_dimensions['I'].width = 20
     
     # Generate unique filename with timestamp
-    from datetime import datetime
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     filename = f'H2O_AI_TestCases_{timestamp}.xlsx'
     
