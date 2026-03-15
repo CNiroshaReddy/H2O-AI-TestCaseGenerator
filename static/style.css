@@ -23,8 +23,8 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-light);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-y: auto;
     padding: 0;
     color: var(--text-primary);
 }
@@ -276,8 +276,6 @@ body {
     background: var(--card-bg);
     border-radius: 0;
     box-shadow: none;
-    overflow: hidden;
-    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
 }
@@ -324,9 +322,7 @@ body {
 /* Tab Content */
 .tab-content {
     padding: 30px;
-    min-height: calc(100vh - 180px);
     flex: 1;
-    overflow-y: auto;
     background: var(--bg-light);
 }
 
@@ -418,10 +414,51 @@ body {
     justify-content: center;
 }
 
-.btn-add:hover {
+.btn-add:hover:not(:disabled) {
     background: var(--accent-dark);
     box-shadow: var(--shadow-md);
     transform: scale(1.1);
+}
+
+.btn-add:disabled {
+    background: #D1D5DB;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+.btn-remove-row {
+    width: 40px;
+    height: 40px;
+    background: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-row:hover:not(:disabled) {
+    background: #DC2626;
+    transform: scale(1.1);
+}
+
+.btn-remove-row:disabled {
+    background: #D1D5DB;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+.action-buttons .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .uploaded-list {

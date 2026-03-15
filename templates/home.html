@@ -25,7 +25,7 @@
     <div id="helpModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Requirement Writing Guide</h2>
+                <h2>Requirement Writing Guide & AI Capabilities</h2>
                 <button class="modal-close" onclick="closeHelpModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -33,64 +33,104 @@
                     <button class="guide-tab-btn active" onclick="switchGuideTab('dos')">✓ DO's</button>
                     <button class="guide-tab-btn" onclick="switchGuideTab('donts')">✗ DON'Ts</button>
                     <button class="guide-tab-btn" onclick="switchGuideTab('examples')">📋 Examples</button>
-                    <button class="guide-tab-btn" onclick="switchGuideTab('checklist')">🎯 Checklist</button>
+                    <button class="guide-tab-btn" onclick="switchGuideTab('ai-features')">🤖 AI Features</button>
                 </div>
 
                 <div id="dos-tab" class="guide-tab-content active">
                     <h3>✓ DO's - Write Clear Requirements</h3>
                     <ul class="guide-list">
-                        <li><strong>Use action verbs:</strong> "Users should be able to register", "System must validate email"</li>
-                        <li><strong>Be specific:</strong> "Password must contain 8+ characters, 1 uppercase, 1 number, 1 special character"</li>
-                        <li><strong>Include constraints:</strong> "Maximum 5 items per cart", "Minimum 10 characters"</li>
-                        <li><strong>Mention error cases:</strong> "If payment fails, display error message"</li>
-                        <li><strong>Use consistent format:</strong> Bullet points or numbered lists work best</li>
-                        <li><strong>Include validation rules:</strong> "Email must be unique and valid format"</li>
-                        <li><strong>Specify conditions:</strong> "Users can only login after email verification"</li>
-                        <li><strong>Mention business rules:</strong> "Generate confirmation number after successful order"</li>
+                        <li><strong>Use action verbs:</strong> "Users should be able to register", "Add products to cart", "Remove items from cart" - AI automatically extracts these actions and generates contextual test steps</li>
+                        <li><strong>Be specific about constraints:</strong> "Password must contain 8+ characters, 1 uppercase, 1 number, 1 special character" - AI detects constraints and generates boundary tests with correct units</li>
+                        <li><strong>Include numbers with units:</strong> "Maximum 5 items per cart", "Minimum 10 characters", "Expire after 24 hours" - AI auto-detects units (items, characters, hours) for smart boundary testing</li>
+                        <li><strong>Mention error cases:</strong> "If payment fails, display error message" - AI generates functional tests for error scenarios</li>
+                        <li><strong>Use consistent format:</strong> Bullet points or numbered lists work best for requirement extraction</li>
+                        <li><strong>Include validation rules:</strong> "Email must be unique and valid format" - AI generates validation and edge case tests with realistic test data</li>
+                        <li><strong>Specify entities clearly:</strong> "Users", "products", "items", "orders", "messages" - AI extracts entities for contextual test data generation</li>
+                        <li><strong>Mention business rules:</strong> "Generate confirmation number after successful order" - AI creates data consistency tests</li>
                     </ul>
                 </div>
 
                 <div id="donts-tab" class="guide-tab-content">
                     <h3>✗ DON'Ts - Avoid These Mistakes</h3>
                     <ul class="guide-list error-list">
-                        <li><strong>Avoid vague statements:</strong> "System should work properly"</li>
-                        <li><strong>Don't use ambiguous language:</strong> "User should be able to do something"</li>
-                        <li><strong>Avoid implicit assumptions:</strong> Assume nothing about domain knowledge</li>
-                        <li><strong>Don't mix multiple requirements:</strong> Keep one requirement per statement</li>
-                        <li><strong>Avoid generic descriptions:</strong> "The system should be good"</li>
-                        <li><strong>Don't skip validation rules:</strong> Always mention format/length requirements</li>
-                        <li><strong>Avoid unclear abbreviations:</strong> Use full terms</li>
+                        <li><strong>Avoid vague statements:</strong> "System should work properly" - AI needs specific actions and entities</li>
+                        <li><strong>Don't use ambiguous language:</strong> "User should be able to do something" - Be specific about what action and what entity</li>
+                        <li><strong>Avoid implicit assumptions:</strong> Assume nothing about domain knowledge - AI works across all domains</li>
+                        <li><strong>Don't mix multiple requirements:</strong> Keep one requirement per statement for better test case generation</li>
+                        <li><strong>Avoid generic descriptions:</strong> "The system should be good" - AI needs measurable, specific requirements</li>
+                        <li><strong>Don't skip validation rules:</strong> Always mention format/length requirements - AI uses these for validation tests</li>
+                        <li><strong>Avoid unclear abbreviations:</strong> Use full terms so AI can extract entities correctly</li>
+                        <li><strong>Don't include error messages as requirements:</strong> "Please try again after 15 minutes" is a message, not a requirement</li>
                     </ul>
                 </div>
 
                 <div id="examples-tab" class="guide-tab-content">
                     <h3>📋 Template Examples</h3>
                     <div class="example-card">
-                        <p class="example-title">✓ Functional Requirement:</p>
-                        <p class="example-text">"Users should be able to register for an account using their email address and password. The email address must be unique and follow valid email format. The password must contain at least 8 characters, including one uppercase letter, one number, and one special character."</p>
+                        <p class="example-title">✓ Functional Requirement (Action-Based):</p>
+                        <p class="example-text">"Users should be able to add products to the shopping cart. The maximum number of items in the cart should not exceed 10."</p>
+                        <p class="example-note">AI generates: Positive test (add product), Negative test (invalid product), Boundary test (10 items limit), Functional test (add operation)</p>
+                    </div>
+                    <div class="example-card">
+                        <p class="example-title">✓ Validation Requirement:</p>
+                        <p class="example-text">"The email address must be unique and follow valid email format. The password must contain at least 8 characters, including one uppercase letter, one number, and one special character."</p>
+                        <p class="example-note">AI generates: Validation tests (email/password format), Boundary test (8 character limit), Edge case test (special characters), Security test (malicious input)</p>
                     </div>
                     <div class="example-card">
                         <p class="example-title">✓ Business Rule:</p>
-                        <p class="example-text">"After successful registration, users should receive a verification email containing a link to activate their account. Users should only be able to login after verifying their email address."</p>
-                    </div>
-                    <div class="example-card">
-                        <p class="example-title">✓ Error Scenario:</p>
-                        <p class="example-text">"If a user enters an incorrect password three times consecutively, the account should be temporarily locked for 10 minutes. After 10 minutes, the user should be able to attempt login again."</p>
+                        <p class="example-text">"The reset link should expire after 24 hours. If no results are found, the system should display a message 'No products found'."</p>
+                        <p class="example-note">AI generates: Boundary test (24 hours), Message test (exact message display), Data consistency test</p>
                     </div>
                 </div>
 
-                <div id="checklist-tab" class="guide-tab-content">
-                    <h3>🎯 Requirement Quality Checklist</h3>
-                    <ul class="checklist">
-                        <li>☐ Requirement has clear action verb (create, register, validate, etc.)</li>
-                        <li>☐ Requirement specifies what entity is affected (user, account, email, etc.)</li>
-                        <li>☐ Requirement includes validation rules or constraints</li>
-                        <li>☐ Requirement mentions error scenarios or edge cases</li>
-                        <li>☐ Requirement is not vague or ambiguous</li>
-                        <li>☐ Requirement is specific and measurable</li>
-                        <li>☐ Requirement is independent (not dependent on other requirements)</li>
-                        <li>☐ Requirement uses consistent terminology</li>
-                    </ul>
+                <div id="ai-features-tab" class="guide-tab-content">
+                    <h3>🤖 AI Capabilities - What the System Does</h3>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h4>🎯 Dynamic Action Extraction</h4>
+                            <p>AI identifies action verbs (add, remove, create, delete, update, validate, etc.) and generates contextual test steps specific to each action.</p>
+                            <p class="example">Example: "Add products" → Test steps include: Prepare product, Add operation, Verify acceptance, Confirm success</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>🏷️ Entity Detection</h4>
+                            <p>AI extracts entities (users, products, items, orders, messages, etc.) and uses them in test data and expected results.</p>
+                            <p class="example">Example: "Remove items from cart" → Test data: "Valid items", Expected: "System successfully removes the items"</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>📊 Smart Test Type Selection</h4>
+                            <p>AI automatically determines which test types are relevant based on requirement keywords:</p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Email/Password → Validation + Security tests</li>
+                                <li>Numbers/Limits → Boundary tests</li>
+                                <li>Unique/Duplicate → Edge case tests</li>
+                                <li>Messages → Message display tests</li>
+                                <li>Save/Store → Data consistency tests</li>
+                            </ul>
+                        </div>
+                        <div class="feature-item">
+                            <h4>🔢 Automatic Unit Detection</h4>
+                            <p>AI detects units from requirements and generates boundary tests with correct units:</p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>"8 characters" → Boundary test: "At limit: 8 characters, Exceeds: 9 characters"</li>
+                                <li>"24 hours" → Boundary test: "At limit: 24 hours, Exceeds: 25 hours"</li>
+                                <li>"10 items" → Boundary test: "At limit: 10 items, Exceeds: 11 items"</li>
+                            </ul>
+                        </div>
+                        <div class="feature-item">
+                            <h4>💾 Realistic Test Data Generation</h4>
+                            <p>AI generates domain-specific test data based on requirement context:</p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Email fields → user@example.com, test@domain.co.uk</li>
+                                <li>Password fields → SecurePass123!, MyP@ssw0rd</li>
+                                <li>Quantities → 1, 5, 10</li>
+                                <li>URLs → https://example.com, https://test.co.uk</li>
+                            </ul>
+                        </div>
+                        <div class="feature-item">
+                            <h4>🌍 Domain-Agnostic</h4>
+                            <p>AI works across any domain (e-commerce, HR, banking, healthcare, etc.) without hardcoded domain logic. It extracts patterns from your requirements.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,9 +151,10 @@
                     
                     <div id="inputs-container">
                         <div class="input-row">
-                            <input type="file" class="file-input" accept=".doc,.docx,.pdf,.txt" multiple>
-                            <input type="text" class="url-input" placeholder="Or enter webpage URL (e.g., https://www.amazon.com)">
-                            <button class="btn-add" onclick="addInputRow()">+</button>
+                            <input type="file" class="file-input" accept=".doc,.docx,.pdf,.txt" onchange="onRowInputChange(this)">
+                            <input type="text" class="url-input" placeholder="Or enter webpage URL (e.g., https://www.amazon.com)" oninput="onRowInputChange(this)">
+                            <button class="btn-add" onclick="addInputRow()" disabled>+</button>
+                            <button class="btn-remove-row" onclick="removeInputRow(this)" disabled>-</button>
                         </div>
                     </div>
                     
@@ -142,8 +183,8 @@
                     <h2>Generated Test Cases</h2>
                     
                     <div class="action-buttons">
-                        <button class="btn-primary" onclick="viewResults()">View your TS & TC</button>
-                        <button class="btn-primary" onclick="downloadExcel()">Download</button>
+                        <button id="viewBtn" class="btn-primary" onclick="viewResults()" disabled>View your TS & TC</button>
+                        <button id="downloadBtn" class="btn-primary" onclick="downloadExcel()" disabled>Download</button>
                     </div>
                     
                     <div id="results-container" class="results-container"></div>

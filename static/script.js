@@ -24,15 +24,124 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
+// Validate URL format
+function isValidUrl(url) {
+    try {
+        const trimmed = url.trim();
+        // Check if URL contains multiple protocol occurrences (https://, http://)
+        const protocolCount = (trimmed.match(/https?:\/\//g) || []).length;
+        if (protocolCount !== 1) return false;
+        
+        const parsed = new URL(trimmed);
+        // Must be http or https
+        if (!['http:', 'https:'].includes(parsed.protocol)) return false;
+        
+        const hostname = parsed.hostname;
+        // Hostname must have a valid TLD: at least one dot, letters-only TLD of 2+ chars
+        if (!/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(hostname)) return false;
+        
+        // Extract TLD and validate against common TLDs
+        const parts = hostname.split('.');
+        const tld = parts[parts.length - 1].toLowerCase();
+        
+        // List of common valid TLDs
+        const validTlds = ['com', 'org', 'net', 'edu', 'gov', 'mil', 'int', 'io', 'co', 'uk', 'us', 'ca', 'de', 'fr', 'it', 'es', 'nl', 'be', 'ch', 'at', 'se', 'no', 'dk', 'fi', 'pl', 'cz', 'ru', 'cn', 'jp', 'kr', 'in', 'au', 'nz', 'br', 'mx', 'za', 'sg', 'hk', 'tw', 'th', 'my', 'ph', 'id', 'vn', 'pk', 'bd', 'ae', 'sa', 'il', 'tr', 'gr', 'pt', 'ie', 'info', 'biz', 'name', 'pro', 'mobi', 'asia', 'tel', 'travel', 'xxx', 'app', 'dev', 'online', 'site', 'website', 'space', 'cloud', 'tech', 'ai', 'tv', 'cc', 'ws', 'me', 'blog', 'shop', 'store', 'news', 'wiki', 'xyz'];
+        
+        if (!validTlds.includes(tld)) return false;
+        
+        return true;
+    } catch { return false; }
+}
+
+// Check if input contains multiple URLs (comma or space separated)
+function containsMultipleUrls(input) {
+    const trimmed = input.trim();
+    // Check for comma separation
+    if (trimmed.includes(',')) return true;
+    // Check for space separation (multiple URLs with spaces)
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    const matches = trimmed.match(urlPattern);
+    return matches && matches.length > 1;
+}
+
+// Enable/disable + and - buttons based on row input
+function onRowInputChange(el) {
+    const row = el.closest('.input-row');
+    const fileInput = row.querySelector('.file-input');
+    const urlInput = row.querySelector('.url-input');
+    const addBtn = row.querySelector('.btn-add');
+    const removeBtn = row.querySelector('.btn-remove-row');
+    const hasFile = fileInput.files.length > 0;
+    const urlVal = urlInput.value.trim();
+    
+    // Check if URL contains multiple URLs (comma or space separated)
+    if (urlVal && containsMultipleUrls(urlVal)) {
+        showValidation('❌ Please enter only one URL per field. Do not use commas or spaces to separate multiple URLs.', 'error');
+        addBtn.disabled = true;
+        removeBtn.disabled = true;
+        return;
+    }
+    
+    // Check if URL has multiple protocols
+    if (urlVal && (urlVal.match(/https?:\/\//g) || []).length > 1) {
+        showValidation('❌ Please enter only one URL. Do not concatenate multiple URLs.', 'error');
+        addBtn.disabled = true;
+        removeBtn.disabled = true;
+        return;
+    }
+    
+    // Check if URL format is invalid
+    if (urlVal && !isValidUrl(urlVal)) {
+        showValidation(`❌ Please enter a valid URL. Example: https://www.example.com`, 'error');
+        addBtn.disabled = true;
+        removeBtn.disabled = true;
+        return;
+    }
+    
+    const hasValidInput = hasFile || (urlVal && isValidUrl(urlVal));
+    addBtn.disabled = !hasValidInput;
+    removeBtn.disabled = !hasValidInput;
+}
+
+// Remove an input row
+function removeInputRow(btn) {
+    const container = document.getElementById('inputs-container');
+    const rows = container.querySelectorAll('.input-row');
+    if (rows.length > 1) {
+        btn.closest('.input-row').remove();
+    } else {
+        const row = btn.closest('.input-row');
+        row.querySelector('.file-input').value = '';
+        row.querySelector('.url-input').value = '';
+        row.querySelector('.btn-add').disabled = true;
+        row.querySelector('.btn-remove-row').disabled = true;
+    }
+    // Re-evaluate button states on all remaining rows
+    const updatedRows = container.querySelectorAll('.input-row');
+    updatedRows.forEach(row => {
+        const fileInput = row.querySelector('.file-input');
+        const urlInput = row.querySelector('.url-input');
+        const hasValidInput = fileInput.files.length > 0 || (urlInput.value.trim() && isValidUrl(urlInput.value.trim()));
+        row.querySelector('.btn-add').disabled = !hasValidInput;
+        row.querySelector('.btn-remove-row').disabled = updatedRows.length === 1 && !hasValidInput;
+    });
+}
+
 // Add new input row
 function addInputRow() {
+    const currentCount = uploadedItems.length + document.querySelectorAll('.input-row').length;
+    if (currentCount >= 5) {
+        alert('❌ Maximum limit of 5 uploads reached.');
+        return;
+    }
     const container = document.getElementById('inputs-container');
     const newRow = document.createElement('div');
     newRow.className = 'input-row';
     newRow.innerHTML = `
-        <input type="file" class="file-input" accept=".doc,.docx,.pdf,.txt" multiple>
-        <input type="text" class="url-input" placeholder="Or enter webpage URL">
-        <button class="btn-add" onclick="addInputRow()">+</button>
+        <input type="file" class="file-input" accept=".doc,.docx,.pdf,.txt" multiple onchange="onRowInputChange(this)">
+        <input type="text" class="url-input" placeholder="Or enter webpage URL" oninput="onRowInputChange(this)">
+        <button class="btn-add" onclick="addInputRow()" disabled>+</button>
+        <button class="btn-remove-row" onclick="removeInputRow(this)" disabled>-</button>
     `;
     container.appendChild(newRow);
 }
@@ -40,65 +149,76 @@ function addInputRow() {
 // Handle upload
 function handleUpload() {
     const inputRows = document.querySelectorAll('.input-row');
-    const validationMsg = document.getElementById('validation-message');
     let hasInput = false;
     let duplicates = [];
-    
+    let errors = [];
+
     inputRows.forEach(row => {
         const fileInput = row.querySelector('.file-input');
         const urlInput = row.querySelector('.url-input');
-        
+
         if (fileInput.files.length > 0) {
             Array.from(fileInput.files).forEach(file => {
-                const ext = file.name.split('.').pop().toLowerCase();
-                if (['doc', 'docx', 'pdf', 'txt'].includes(ext)) {
-                    // Check for duplicates
-                    const isDuplicate = uploadedItems.some(item => 
-                        item.type === 'file' && item.name.toLowerCase() === file.name.toLowerCase()
-                    );
-                    
-                    if (isDuplicate) {
-                        duplicates.push(`File: ${file.name}`);
-                    } else {
-                        uploadedItems.push({ type: 'file', name: file.name, file: file });
-                        hasInput = true;
-                    }
-                } else {
-                    showValidation('Unsupported file type: ' + file.name, 'error');
+                if (uploadedItems.length >= 5) {
+                    showValidation('Maximum limit of 5 uploads reached.', 'error');
+                    return;
                 }
+                if (file.size === 0) {
+                    errors.push(`File "${file.name}" is empty.`);
+                    return;
+                }
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!['doc', 'docx', 'pdf', 'txt'].includes(ext)) {
+                    errors.push(`Unsupported file type: "${file.name}". Please upload .doc, .docx, .pdf, or .txt files.`);
+                    return;
+                }
+                const isDuplicate = uploadedItems.some(item =>
+                    item.type === 'file' && item.name.toLowerCase() === file.name.toLowerCase()
+                );
+                if (isDuplicate) { duplicates.push(`File: ${file.name}`); return; }
+                uploadedItems.push({ type: 'file', name: file.name, file: file });
+                hasInput = true;
             });
         }
-        
+
         if (urlInput.value.trim()) {
+            if (uploadedItems.length >= 5) {
+                showValidation('Maximum limit of 5 uploads reached.', 'error');
+                return;
+            }
             const url = urlInput.value.trim();
-            // Check for duplicates
-            const isDuplicate = uploadedItems.some(item => 
+            
+            // Check for multiple URLs (comma or space separated)
+            if (containsMultipleUrls(url)) {
+                errors.push('Please enter only one URL per field. Do not use commas or spaces to separate multiple URLs.');
+                return;
+            }
+            
+            if (!isValidUrl(url)) {
+                errors.push(`Please enter a valid URL: "${url}"`);
+                return;
+            }
+            const isDuplicate = uploadedItems.some(item =>
                 item.type === 'url' && item.name.toLowerCase() === url.toLowerCase()
             );
-            
-            if (isDuplicate) {
-                duplicates.push(`URL: ${url}`);
-            } else {
-                uploadedItems.push({ type: 'url', name: url });
-                hasInput = true;
-            }
+            if (isDuplicate) { duplicates.push(`URL: ${url}`); return; }
+            uploadedItems.push({ type: 'url', name: url });
+            hasInput = true;
         }
     });
-    
-    // Show duplicate error if any
+
+    if (errors.length > 0) {
+        showValidation('❌ ' + errors[0], 'error');
+        return;
+    }
     if (duplicates.length > 0) {
-        alert(`❌ Duplicate items detected!\n\nThe following items are already uploaded:\n\n${duplicates.join('\n')}\n\nPlease remove duplicates and try again.`);
+        alert(`❌ Duplicate items detected!\n\n${duplicates.join('\n')}\n\nPlease remove duplicates and try again.`);
         showValidation(`${duplicates.length} duplicate item(s) found and not added`, 'error');
     }
-    
     if (hasInput) {
         updateUploadedList();
         document.getElementById('generateBtn').disabled = false;
-        if (duplicates.length === 0) {
-            showValidation('✅ Items added successfully!', 'success');
-        } else {
-            showValidation('✅ Some items added (duplicates skipped)', 'success');
-        }
+        showValidation(duplicates.length === 0 ? '✅ Items added successfully!' : '✅ Some items added (duplicates skipped)', 'success');
     } else if (duplicates.length === 0) {
         showValidation('❌ Please select files or enter URLs', 'error');
     }
@@ -183,6 +303,11 @@ async function generateTestCases() {
         });
         
         console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status} ${response.statusText}`);
+        }
+        
         const data = await response.json();
         console.log('Response data:', data);
         
@@ -196,6 +321,10 @@ async function generateTestCases() {
             data.results.forEach(scenario => {
                 totalTestCases += scenario.test_cases.length;
             });
+
+            // Enable View and Download buttons
+            document.getElementById('viewBtn').disabled = false;
+            document.getElementById('downloadBtn').disabled = false;
             
             // Switch to output tab
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -221,10 +350,18 @@ async function generateTestCases() {
         }
     } catch (error) {
         console.error('ERROR during fetch:', error);
-        alert('❌ Error: ' + error.message);
+        let errorMsg = error.message;
+        
+        if (error instanceof TypeError) {
+            errorMsg = 'Server is unreachable. Please check your connection and try again.';
+        } else if (error.message.includes('Server error')) {
+            errorMsg = `Server error occurred. ${error.message}`;
+        }
+        
+        alert('❌ Error: ' + errorMsg);
         loading.style.display = 'none';
         generateBtn.disabled = false;
-        showValidation('Error: ' + error.message, 'error');
+        showValidation('Error: ' + errorMsg, 'error');
     }
 }
 
@@ -380,9 +517,9 @@ document.addEventListener('keydown', function(event) {
         }
     }
     
-    // Arrow keys for tab navigation
+    // Arrow keys for tab navigation (only when not in input field)
     const tabButtons = document.querySelectorAll('.tab-btn');
-    if (tabButtons.length > 0) {
+    if (tabButtons.length > 0 && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
         const activeTab = document.querySelector('.tab-btn.active');
         let currentIndex = Array.from(tabButtons).indexOf(activeTab);
         
