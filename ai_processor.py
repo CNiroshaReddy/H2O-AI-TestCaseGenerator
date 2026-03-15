@@ -12,7 +12,7 @@ class AIProcessor:
             r'privacy policy|terms of service|contact us|home|blog',
             r'page not found|404|error|sorry',
             r'press.*enter.*skip|open menu|navigation',
-            r'search|login|logout|sign up|register',
+            r'login|logout|sign up|register',
             r'practice test automation|practice courses',
             r'^[a-z0-9\s]{1,3}$',
             r'please try again after|try again in|wait.*minutes|wait.*hours',
@@ -98,7 +98,7 @@ class AIProcessor:
         return False
     
     def _extract_requirements(self, content):
-        """Extract requirements from content with improved filtering"""
+        """Extract requirements from content with improved filtering and sentence grouping"""
         requirements = []
         
         content = re.sub(r'System Name:.*?\n', '', content, flags=re.IGNORECASE)
@@ -114,11 +114,33 @@ class AIProcessor:
                     requirements.append(req)
         
         if not requirements:
-            sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', content)
-            for sentence in sentences:
-                sentence = sentence.strip()
-                if len(sentence) > 20 and sentence and not self._is_noise(sentence):
-                    requirements.append(sentence)
+            requirements = self._group_related_sentences(content)
+        
+        return requirements
+    
+    def _group_related_sentences(self, content):
+        """Group related sentences together to keep context intact"""
+        requirements = []
+        sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', content)
+        
+        current_group = []
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence or self._is_noise(sentence):
+                continue
+            
+            current_group.append(sentence)
+            
+            if len(' '.join(current_group)) > 100 or sentence.endswith('.'):
+                grouped = ' '.join(current_group).strip()
+                if len(grouped) > 20:
+                    requirements.append(grouped)
+                current_group = []
+        
+        if current_group:
+            grouped = ' '.join(current_group).strip()
+            if len(grouped) > 20:
+                requirements.append(grouped)
         
         return requirements
     
@@ -140,7 +162,7 @@ class AIProcessor:
                 'test_cases': []
             }
             
-            test_cases = self._create_test_cases_for_requirement(req)
+            test_cases = self._generate_comprehensive_tests(req)
             
             for test_case in test_cases:
                 tc = {
@@ -150,7 +172,7 @@ class AIProcessor:
                     'test_data': test_case['test_data'],
                     'results': '',
                     'defects': '',
-                    'comments': f"Type: {test_case['type']} | Priority: {test_case['priority']}"
+                    'comments': f"Type: {test_case['type']} | Category: {test_case['category']} | Priority: {test_case['priority']}"
                 }
                 scenario_obj['test_cases'].append(tc)
                 tc_counter += 1
@@ -160,371 +182,566 @@ class AIProcessor:
         
         return results
     
-    def _create_test_cases_for_requirement(self, req):
-        """Create contextual test cases based on requirement characteristics"""
+    def _generate_comprehensive_tests(self, req):
+        """Generate comprehensive test cases by analyzing requirement dynamically"""
         req_lower = req.lower()
         test_cases = []
         
-        numbers = re.findall(r'\d+', req)
-        messages = re.findall(r'"([^"]*)"', req)
+        details = self._analyze_requirement(req, req_lower)
         
-        test_types = self._determine_test_types(req_lower, numbers, messages)
-        
-        for test_type in test_types:
-            test_case = self._generate_contextual_test_case(test_type, req, req_lower, numbers, messages)
-            if test_case['steps']:
-                test_cases.append(test_case)
+        test_cases.extend(self._generate_positive_tests(req, details))
+        test_cases.extend(self._generate_negative_tests(req, details))
+        test_cases.extend(self._generate_boundary_tests(req, details))
+        test_cases.extend(self._generate_edge_case_tests(req, details))
+        test_cases.extend(self._generate_error_handling_tests(req, details))
+        test_cases.extend(self._generate_security_tests(req, details))
+        test_cases.extend(self._generate_ui_interaction_tests(req, details))
+        test_cases.extend(self._generate_workflow_tests(req, details))
         
         return test_cases
     
-    def _determine_test_types(self, req_lower, numbers, messages):
-        """Determine which test types are relevant for this requirement"""
-        test_types = ['Positive', 'Negative']
+    def _analyze_requirement(self, req, req_lower):
+        """Dynamically analyze requirement and extract all relevant details"""
+        details = {
+            'actor': self._extract_actor(req),
+            'action': self._extract_action(req),
+            'condition': self._extract_condition(req),
+            'expected_outcome': self._extract_expected_outcome(req),
+            'ui_elements': self._extract_ui_elements(req),
+            'business_rules': self._extract_business_rules(req),
+            'workflow_steps': self._extract_workflow_steps(req),
+            'field_patterns': self._extract_field_patterns(req),
+            'messages': self._extract_quoted_messages(req),
+            'numbers': re.findall(r'\d+', req),
+            'errors': self._extract_error_keywords(req_lower),
+            'conditions': self._extract_condition_keywords(req_lower),
+        }
         
-        if any(keyword in req_lower for keyword in ['email', 'password', 'username', 'phone', 'date', 'format', 'validate', 'required', 'field', 'input', 'must', 'should contain', 'must contain']):
-            test_types.append('Validation')
-        
-        if any(keyword in req_lower for keyword in ['secure', 'encrypt', 'token', 'auth', 'permission', 'access', 'role', 'login', 'password']):
-            test_types.append('Security')
-        
-        if any(keyword in req_lower for keyword in ['lock', 'attempt', 'fail', 'retry', 'timeout', 'session', 'invalid', 'error']):
-            test_types.append('Functional')
-        
-        if any(keyword in req_lower for keyword in ['unique', 'duplicate', 'special', 'character', 'unicode', 'null', 'empty']):
-            test_types.append('Edge Case')
-        
-        if messages or any(keyword in req_lower for keyword in ['message', 'display', 'show', 'notify', 'alert', 'error', 'text']):
-            test_types.append('Message')
-        
-        if any(keyword in req_lower for keyword in ['save', 'store', 'persist', 'database', 'data', 'consistency', 'integrity']):
-            test_types.append('Data Consistency')
-        
-        if any(keyword in req_lower for keyword in ['performance', 'speed', 'load', 'concurrent', 'response', 'time']):
-            test_types.append('Performance')
-        
-        if numbers and not any(x in req_lower for x in ['404', '2020', '2024', 'copyright']):
-            test_types.append('Boundary')
-        
-        return test_types
+        return details
     
-    def _generate_contextual_test_case(self, test_type, req, req_lower, numbers, messages):
-        """Generate contextual test case based on type and requirement"""
-        if test_type == 'Positive':
-            return self._generate_positive_test(req, req_lower)
-        elif test_type == 'Negative':
-            return self._generate_negative_test(req, req_lower)
-        elif test_type == 'Boundary':
-            return self._generate_boundary_test(req, req_lower, numbers)
-        elif test_type == 'Validation':
-            return self._generate_validation_test(req, req_lower)
-        elif test_type == 'Security':
-            return self._generate_security_test(req, req_lower)
-        elif test_type == 'Functional':
-            return self._generate_functional_test(req, req_lower)
-        elif test_type == 'Edge Case':
-            return self._generate_edge_case_test(req, req_lower)
-        elif test_type == 'Performance':
-            return self._generate_performance_test(req, req_lower)
-        elif test_type == 'Data Consistency':
-            return self._generate_data_consistency_test(req, req_lower)
-        elif test_type == 'Message':
-            return self._generate_message_test(req, req_lower, messages)
-        
-        return {'type': test_type, 'priority': 'Medium', 'steps': '', 'expected': '', 'test_data': ''}
+    def _extract_actor(self, req):
+        """Extract actor (who performs the action)"""
+        actor_patterns = [
+            r'(?:the\s+)?(\w+(?:\s+\w+)?)\s+(?:should|can|must|will|is able to)',
+            r'(?:as\s+(?:a|an)\s+)?(\w+(?:\s+\w+)?)\s+(?:i\s+)?(?:want|need)',
+        ]
+        for pattern in actor_patterns:
+            match = re.search(pattern, req, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return "User"
     
-    def _extract_action_and_entity(self, req_lower):
-        """Dynamically extract action verb and entity from requirement"""
-        action_verbs = ['add', 'remove', 'delete', 'create', 'update', 'modify', 'edit', 'submit', 'upload', 'download', 'export', 'import', 'search', 'filter', 'sort', 'view', 'display', 'show', 'hide', 'enable', 'disable', 'lock', 'unlock', 'approve', 'reject', 'publish', 'unpublish']
+    def _extract_action(self, req):
+        """Extract primary action from requirement"""
+        action_verbs = ['add', 'remove', 'delete', 'create', 'update', 'modify', 'edit', 'submit', 'upload', 'download', 'export', 'import', 'search', 'filter', 'sort', 'view', 'display', 'show', 'hide', 'enable', 'disable', 'lock', 'unlock', 'approve', 'reject', 'publish', 'unpublish', 'register', 'login', 'logout', 'verify', 'validate', 'authenticate', 'authorize', 'reset', 'recover', 'send', 'receive', 'retrieve', 'store', 'save', 'persist', 'cancel', 'confirm', 'accept', 'decline', 'process']
         
-        action = None
         for verb in action_verbs:
-            if verb in req_lower:
-                action = verb
-                break
+            if verb in req.lower():
+                match = re.search(rf'{verb}\s+(\w+(?:\s+\w+)?)', req, re.IGNORECASE)
+                if match:
+                    return f"{verb} {match.group(1)}"
+                return verb
+        return "Perform operation"
+    
+    def _extract_condition(self, req):
+        """Extract condition (when/if the action should happen)"""
+        condition_patterns = [
+            r'(?:if|when|unless|only if|provided that)\s+([^.!?]+)',
+            r'using\s+([^.!?]+)',
+            r'with\s+([^.!?]+)',
+        ]
+        for pattern in condition_patterns:
+            match = re.search(pattern, req, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return None
+    
+    def _extract_expected_outcome(self, req):
+        """Extract expected outcome/result"""
+        outcome_patterns = [
+            r'(?:should|must|will)\s+([^.!?]+)',
+            r'(?:result|outcome|expect)\s+(?:is|should be)\s+([^.!?]+)',
+            r'(?:then|so that)\s+([^.!?]+)',
+        ]
+        for pattern in outcome_patterns:
+            match = re.search(pattern, req, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return "Operation completes successfully"
+    
+    def _extract_ui_elements(self, req):
+        """Extract UI elements mentioned in requirement"""
+        ui_elements = []
+        ui_keywords = {
+            'button': r'\b(?:button|btn|click|submit|save|cancel|ok|close)\b',
+            'field': r'\b(?:field|input|textbox|text box|text field|entry)\b',
+            'dropdown': r'\b(?:dropdown|drop-down|select|combo box|list)\b',
+            'checkbox': r'\b(?:checkbox|check box|tick|toggle)\b',
+            'radio': r'\b(?:radio|radio button)\b',
+            'link': r'\b(?:link|hyperlink|url)\b',
+            'upload': r'\b(?:upload|file upload|attach|attachment)\b',
+            'table': r'\b(?:table|grid|data grid)\b',
+            'modal': r'\b(?:modal|dialog|popup|pop-up)\b',
+            'menu': r'\b(?:menu|navigation|nav)\b',
+        }
         
-        entity_patterns = [
-            r'(?:add|remove|delete|create|update)\s+(?:a\s+)?(\w+)',
-            r'(?:users?|items?|products?|records?|entries?|documents?|files?|messages?|comments?|posts?|tasks?|events?|orders?|invoices?|reports?|accounts?|profiles?|settings?|permissions?|roles?|groups?|categories?|tags?|attachments?|notifications?|alerts?|logs?|backups?|versions?|templates?|workflows?|processes?|services?|resources?|assets?|data|information)',
+        for element_type, pattern in ui_keywords.items():
+            if re.search(pattern, req, re.IGNORECASE):
+                ui_elements.append(element_type)
+        
+        return ui_elements
+    
+    def _extract_business_rules(self, req):
+        """Extract business rules and constraints"""
+        rules = []
+        
+        constraint_patterns = [
+            (r'(?:maximum|max|at most|not exceed|up to)\s+([\$]?\d+(?:\.\d{2})?)', 'max'),
+            (r'(?:minimum|min|at least)\s+([\$]?\d+(?:\.\d{2})?)', 'min'),
+            (r'(?:exactly|equal to)\s+([\$]?\d+(?:\.\d{2})?)', 'exact'),
+            (r'([\$]?\d+(?:\.\d{2})?)\s+(?:items?|records?|characters?|bytes?|seconds?|minutes?|hours?|days?|documents?|files?)', 'count'),
         ]
         
-        entity = None
-        for pattern in entity_patterns:
-            match = re.search(pattern, req_lower)
-            if match:
-                entity = match.group(1) if match.groups() else match.group(0)
-                break
+        for pattern, rule_type in constraint_patterns:
+            matches = re.findall(pattern, req, re.IGNORECASE)
+            for match in matches:
+                if isinstance(match, tuple):
+                    value = match[0]
+                else:
+                    value = match
+                rules.append({'type': rule_type, 'value': value})
         
-        return action, entity
+        return rules
     
-    def _generate_positive_test(self, req, req_lower):
-        action, entity = self._extract_action_and_entity(req_lower)
-        test_data = self._generate_realistic_test_data(req_lower, 'valid')
+    def _extract_workflow_steps(self, req):
+        """Extract multi-step workflow from requirement"""
+        steps = []
         
-        if action and entity:
-            steps = f'1. Prepare valid {entity}: {test_data}\n2. {action.capitalize()} the {entity}\n3. Verify system accepts input\n4. Confirm operation succeeds\n5. Validate {entity} is {action}ed'
-            expected = f'System successfully {action}s the {entity}'
+        workflow_indicators = ['then', 'after', 'next', 'subsequently', 'following', 'once', 'before', 'prior to']
+        
+        sentences = re.split(r'(?<=[.!?])\s+', req)
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if any(indicator in sentence.lower() for indicator in workflow_indicators):
+                steps.append(sentence)
+        
+        if len(steps) > 1:
+            return steps
+        
+        step_patterns = re.split(r'(?:then|after|next|subsequently|following|once|before|prior to)\s+', req, flags=re.IGNORECASE)
+        if len(step_patterns) > 1:
+            return [s.strip() for s in step_patterns if s.strip()]
+        
+        return []
+    
+    def _extract_field_patterns(self, req):
+        """Dynamically extract field patterns from requirement text"""
+        patterns = []
+        
+        field_pattern = r'(\w+(?:\s+\w+)*)\s+(?:field|input|value|parameter|attribute|property)'
+        matches = re.findall(field_pattern, req, re.IGNORECASE)
+        for match in matches:
+            patterns.append(match.strip())
+        
+        return patterns
+    
+    def _extract_quoted_messages(self, req):
+        """Extract quoted messages as complete units"""
+        messages = re.findall(r'["\']([^"\']*)["\']', req)
+        return messages
+    
+    def _extract_error_keywords(self, req_lower):
+        """Extract error-related keywords"""
+        error_keywords = ['error', 'fail', 'invalid', 'reject', 'deny', 'prevent', 'block', 'restrict', 'not allowed', 'forbidden', 'unauthorized', 'exception', 'warning', 'alert']
+        errors = []
+        for keyword in error_keywords:
+            if keyword in req_lower:
+                errors.append(keyword)
+        return errors
+    
+    def _extract_condition_keywords(self, req_lower):
+        """Extract condition keywords"""
+        condition_keywords = ['if', 'when', 'unless', 'only if', 'provided that', 'in case', 'should', 'must', 'can', 'cannot', 'may', 'should not']
+        conditions = []
+        for keyword in condition_keywords:
+            if keyword in req_lower:
+                conditions.append(keyword)
+        return conditions
+    
+    def _detect_field_type(self, field_name):
+        """Detect field type based on field name patterns"""
+        field_lower = field_name.lower()
+        
+        if any(keyword in field_lower for keyword in ['email', 'mail']):
+            return 'email'
+        elif any(keyword in field_lower for keyword in ['password', 'pwd', 'pass']):
+            return 'password'
+        elif any(keyword in field_lower for keyword in ['phone', 'mobile', 'contact']):
+            return 'phone'
+        elif any(keyword in field_lower for keyword in ['age', 'year', 'birth']):
+            return 'age'
+        elif any(keyword in field_lower for keyword in ['date', 'dob']):
+            return 'date'
+        elif any(keyword in field_lower for keyword in ['url', 'website', 'link']):
+            return 'url'
+        elif any(keyword in field_lower for keyword in ['amount', 'price', 'cost', 'salary']):
+            return 'amount'
+        elif any(keyword in field_lower for keyword in ['username', 'user', 'name']):
+            return 'username'
+        elif any(keyword in field_lower for keyword in ['zip', 'postal', 'code']):
+            return 'zipcode'
+        elif any(keyword in field_lower for keyword in ['credit', 'card', 'number']):
+            return 'card'
         else:
-            steps = f'1. Prepare valid test data: {test_data}\n2. Execute the required operation\n3. Verify system accepts input\n4. Confirm operation succeeds\n5. Validate expected outcome'
-            expected = 'System successfully executes the required operation'
+            return 'text'
+    
+    def _generate_test_data(self, field_name, field_type=None):
+        """Generate intelligent test data for detected field types"""
+        if field_type is None:
+            field_type = self._detect_field_type(field_name)
         
-        return {
+        test_data = {
+            'valid': [],
+            'invalid': [],
+            'boundary': [],
+            'edge_case': []
+        }
+        
+        if field_type == 'email':
+            test_data['valid'] = ['test@example.com', 'user.name@domain.co.uk', 'john123@company.org']
+            test_data['invalid'] = ['test@', '@example.com', 'test@.com', 'test..@example.com', 'test@domain']
+            test_data['boundary'] = ['a@b.co', 'verylongemailaddress@verylongdomainname.com']
+            test_data['edge_case'] = ['test+tag@example.com', 'test_name@example.com', '123@example.com']
+        
+        elif field_type == 'password':
+            test_data['valid'] = ['P@ssw0rd123', 'SecurePass!2024', 'MyP@ss123']
+            test_data['invalid'] = ['123', 'password', 'pass', '12345678', 'abcdefgh']
+            test_data['boundary'] = ['P@1', 'P@ssw0rd123456789012345']
+            test_data['edge_case'] = ['P@ss!@#$%', 'Pass123!@#', 'P@ss 123']
+        
+        elif field_type == 'phone':
+            test_data['valid'] = ['555-123-4567', '(555) 123-4567', '+1-555-123-4567', '5551234567']
+            test_data['invalid'] = ['123', 'abc-def-ghij', '555-12-3456', '(555) 123']
+            test_data['boundary'] = ['1234567', '55512345678901']
+            test_data['edge_case'] = ['555-123-4567 ext 123', '+44-20-7946-0958', '001-555-123-4567']
+        
+        elif field_type == 'age':
+            test_data['valid'] = ['25', '18', '65', '30']
+            test_data['invalid'] = ['-5', '150', 'abc', '25.5']
+            test_data['boundary'] = ['0', '1', '17', '18', '65', '120']
+            test_data['edge_case'] = ['00', '018', '065']
+        
+        elif field_type == 'date':
+            test_data['valid'] = ['12/25/2024', '01/01/2024', '06/15/2023']
+            test_data['invalid'] = ['13/32/2024', '00/00/0000', '2024-12-25', '25-12-2024']
+            test_data['boundary'] = ['01/01/1900', '12/31/2099', '02/29/2024']
+            test_data['edge_case'] = ['02/29/2023', '12/31/1999', '01/01/2000']
+        
+        elif field_type == 'url':
+            test_data['valid'] = ['https://example.com', 'http://www.example.com', 'https://example.com/path']
+            test_data['invalid'] = ['example.com', 'htp://example.com', 'https://', 'https://example']
+            test_data['boundary'] = ['https://a.co', 'https://verylongdomainname.com/very/long/path/structure']
+            test_data['edge_case'] = ['https://example.com:8080', 'https://example.com/path?query=value', 'https://example.com#anchor']
+        
+        elif field_type == 'amount':
+            test_data['valid'] = ['100.00', '50.50', '1000.99', '0.01']
+            test_data['invalid'] = ['-50', 'abc', '100.999', '$100']
+            test_data['boundary'] = ['0.00', '0.01', '999999.99', '1000000.00']
+            test_data['edge_case'] = ['0.001', '100', '100.1', '100.10']
+        
+        elif field_type == 'username':
+            test_data['valid'] = ['john_doe', 'user123', 'john.doe', 'johndoe']
+            test_data['invalid'] = ['john doe', 'john@doe', 'j', 'john-doe-with-very-long-name']
+            test_data['boundary'] = ['ab', 'a', 'verylongusernamethatexceedslimit']
+            test_data['edge_case'] = ['user_123', 'user.123', 'user123_', '_user123']
+        
+        elif field_type == 'zipcode':
+            test_data['valid'] = ['12345', '12345-6789', 'A1A 1A1']
+            test_data['invalid'] = ['123', 'abcde', '12345-', '123-45']
+            test_data['boundary'] = ['00000', '99999', '00000-0000']
+            test_data['edge_case'] = ['12345-0000', 'A0A 0A0', '00001']
+        
+        elif field_type == 'card':
+            test_data['valid'] = ['4532015112830366', '5425233010103442', '378282246310005']
+            test_data['invalid'] = ['123456', 'abcd1234efgh5678', '4532015112830367']
+            test_data['boundary'] = ['0000000000000000', '9999999999999999']
+            test_data['edge_case'] = ['4532-0151-1283-0366', '4532 0151 1283 0366']
+        
+        else:  # text
+            test_data['valid'] = ['Sample text', 'Valid input', 'Test data']
+            test_data['invalid'] = ['', None]
+            test_data['boundary'] = ['a', 'verylongtextthatmightexceedmaximumlength']
+            test_data['edge_case'] = ['Text with @#$%', 'Text with 中文', 'Text with \n newline']
+        
+        return test_data
+    
+    def _generate_positive_tests(self, req, details):
+        """Generate positive scenario tests"""
+        tests = []
+        
+        actor = details['actor']
+        action = details['action']
+        condition = details['condition']
+        outcome = details['expected_outcome']
+        field_patterns = details['field_patterns']
+        
+        if condition:
+            steps = f'1. Ensure {condition}\n2. {actor} performs: {action}\n3. Verify system accepts input\n4. Confirm {action} completes\n5. Validate: {outcome}'
+        else:
+            steps = f'1. {actor} prepares for: {action}\n2. Execute {action}\n3. Verify system accepts input\n4. Confirm {action} completes\n5. Validate: {outcome}'
+        
+        test_data_str = f'Valid data for {action}'
+        if field_patterns:
+            field_data = []
+            for field in field_patterns[:3]:
+                test_data = self._generate_test_data(field)
+                if test_data['valid']:
+                    field_data.append(f"{field}: {test_data['valid'][0]}")
+            if field_data:
+                test_data_str = ' | '.join(field_data)
+        
+        tests.append({
             'type': 'Positive',
+            'category': 'Positive Test',
             'priority': 'High',
             'steps': steps,
-            'expected': expected,
-            'test_data': test_data
-        }
-    
-    def _generate_negative_test(self, req, req_lower):
-        action, entity = self._extract_action_and_entity(req_lower)
-        test_data = self._generate_realistic_test_data(req_lower, 'invalid')
+            'expected': outcome,
+            'test_data': test_data_str
+        })
         
-        if action and entity:
-            steps = f'1. Prepare invalid {entity}: {test_data}\n2. Attempt to {action} the {entity}\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify operation not executed'
-            expected = f'System rejects invalid {entity} with appropriate error message'
+        return tests
+    
+    def _generate_negative_tests(self, req, details):
+        """Generate negative scenario tests"""
+        tests = []
+        
+        actor = details['actor']
+        action = details['action']
+        field_patterns = details['field_patterns']
+        
+        if details['errors']:
+            error = details['errors'][0]
+            test_data_str = 'Invalid data'
+            if field_patterns:
+                field_data = []
+                for field in field_patterns[:3]:
+                    test_data = self._generate_test_data(field)
+                    if test_data['invalid']:
+                        field_data.append(f"{field}: {test_data['invalid'][0]}")
+                if field_data:
+                    test_data_str = ' | '.join(field_data)
+            
+            tests.append({
+                'type': 'Negative',
+                'category': 'Negative Test',
+                'priority': 'High',
+                'steps': f'1. {actor} prepares invalid data\n2. Attempt to {action}\n3. Verify system rejects input\n4. Confirm {error} message displayed\n5. Validate operation not executed',
+                'expected': f'System rejects with {error}',
+                'test_data': test_data_str
+            })
         else:
-            steps = f'1. Prepare invalid test data: {test_data}\n2. Attempt to execute the required operation\n3. Verify system rejects input\n4. Confirm error message displayed\n5. Verify operation not executed'
-            expected = 'System rejects invalid input with appropriate error message'
+            test_data_str = 'Invalid data'
+            if field_patterns:
+                field_data = []
+                for field in field_patterns[:3]:
+                    test_data = self._generate_test_data(field)
+                    if test_data['invalid']:
+                        field_data.append(f"{field}: {test_data['invalid'][0]}")
+                if field_data:
+                    test_data_str = ' | '.join(field_data)
+            
+            tests.append({
+                'type': 'Negative',
+                'category': 'Negative Test',
+                'priority': 'High',
+                'steps': f'1. {actor} prepares invalid data\n2. Attempt to {action}\n3. Verify system rejects\n4. Confirm error message displayed\n5. Validate operation not executed',
+                'expected': 'System rejects invalid input',
+                'test_data': test_data_str
+            })
         
-        return {
-            'type': 'Negative',
-            'priority': 'High',
-            'steps': steps,
-            'expected': expected,
-            'test_data': test_data
-        }
+        return tests
     
-    def _generate_boundary_test(self, req, req_lower, numbers):
-        if not numbers:
-            return {'type': 'Boundary', 'priority': 'Medium', 'steps': '', 'expected': '', 'test_data': ''}
+    def _generate_boundary_tests(self, req, details):
+        """Generate boundary condition tests based on business rules"""
+        tests = []
         
-        limit = int(numbers[0])
+        actor = details['actor']
+        action = details['action']
+        field_patterns = details['field_patterns']
         
-        unit = 'items'
-        if 'character' in req_lower or 'char' in req_lower:
-            unit = 'characters'
-        elif 'hour' in req_lower:
-            unit = 'hours'
-        elif 'minute' in req_lower:
-            unit = 'minutes'
-        elif 'second' in req_lower:
-            unit = 'seconds'
-        elif 'day' in req_lower:
-            unit = 'days'
+        for rule in details['business_rules']:
+            if rule['type'] in ['max', 'min']:
+                try:
+                    limit = float(rule['value'].replace('$', '').replace(',', ''))
+                    if rule['type'] == 'max':
+                        tests.append({
+                            'type': 'Boundary',
+                            'category': 'Boundary Value Test',
+                            'priority': 'High',
+                            'steps': f'1. {actor} attempts {action} with value at limit: {limit}\n2. Verify system accepts\n3. {actor} attempts with value exceeding: {limit + 1}\n4. Verify system rejects\n5. Confirm boundary enforced',
+                            'expected': f'System enforces maximum limit of {limit}',
+                            'test_data': f'At limit: {limit}, Exceeds: {limit + 1}, Below: {max(0, limit - 1)}'
+                        })
+                    else:
+                        tests.append({
+                            'type': 'Boundary',
+                            'category': 'Boundary Value Test',
+                            'priority': 'High',
+                            'steps': f'1. {actor} attempts {action} with value below limit: {max(0, limit - 1)}\n2. Verify system rejects\n3. {actor} attempts with value at limit: {limit}\n4. Verify system accepts\n5. Confirm boundary enforced',
+                            'expected': f'System enforces minimum limit of {limit}',
+                            'test_data': f'Below limit: {max(0, limit - 1)}, At limit: {limit}, Above: {limit + 1}'
+                        })
+                except:
+                    pass
         
-        return {
-            'type': 'Boundary',
-            'priority': 'High',
-            'steps': f'1. Test with value at limit: {limit} {unit}\n2. Verify system accepts\n3. Test with value exceeding limit: {limit + 1} {unit}\n4. Verify system rejects\n5. Confirm boundary enforced correctly',
-            'expected': f'System enforces limit of {limit} {unit} correctly',
-            'test_data': f'At limit: {limit} {unit}, Exceeds limit: {limit + 1} {unit}, Below limit: {max(1, limit - 1)} {unit}'
-        }
-    
-    def _generate_validation_test(self, req, req_lower):
-        if 'email' in req_lower:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter invalid email: "user@invalid", "user@.com", "user.com"\n2. Verify validation error\n3. Enter valid email: "user@example.com"\n4. Verify system accepts\n5. Confirm email validation enforced',
-                'expected': 'Email format validation properly enforced',
-                'test_data': 'Invalid: user@invalid, user@.com, user.com | Valid: user@example.com, test@domain.co.uk'
-            }
-        elif 'username' in req_lower:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter invalid username: "", "a", "user@123!"\n2. Verify validation error\n3. Enter valid username: "student", "testuser"\n4. Verify system accepts\n5. Confirm username validation enforced',
-                'expected': 'Username validation properly enforced',
-                'test_data': 'Invalid: empty, single char, special chars | Valid: student, testuser, john_doe'
-            }
-        elif 'password' in req_lower:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter weak password: "pass123"\n2. Verify validation error\n3. Enter strong password: "SecurePass123!"\n4. Verify system accepts\n5. Confirm password validation enforced',
-                'expected': 'Password validation properly enforced',
-                'test_data': 'Weak: pass123, PASSWORD123 | Strong: SecurePass123!, MyP@ssw0rd'
-            }
-        elif 'phone' in req_lower:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter invalid phone: "123", "abc1234567"\n2. Verify validation error\n3. Enter valid phone: "555-123-4567"\n4. Verify system accepts\n5. Confirm phone validation enforced',
-                'expected': 'Phone format validation properly enforced',
-                'test_data': 'Invalid: 123, abc1234567 | Valid: 555-123-4567, (555) 123-4567'
-            }
-        elif 'date' in req_lower:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter invalid date: "13/32/2024", "2024-13-01"\n2. Verify validation error\n3. Enter valid date: "12/25/2024"\n4. Verify system accepts\n5. Confirm date validation enforced',
-                'expected': 'Date format validation properly enforced',
-                'test_data': 'Invalid: 13/32/2024, 2024-13-01 | Valid: 12/25/2024, 2024-12-25'
-            }
-        else:
-            return {
-                'type': 'Validation',
-                'priority': 'High',
-                'steps': '1. Enter invalid data format\n2. Verify validation error\n3. Enter valid data format\n4. Verify system accepts\n5. Confirm validation enforced',
-                'expected': 'Data validation properly enforced',
-                'test_data': 'Invalid and valid data formats'
-            }
-    
-    def _generate_security_test(self, req, req_lower):
-        if 'auth' in req_lower or 'login' in req_lower:
-            return {
-                'type': 'Security',
-                'priority': 'High',
-                'steps': '1. Attempt SQL injection: "admin\' OR \'1\'=\'1"\n2. Verify system sanitizes input\n3. Attempt XSS: "<script>alert(\'xss\')</script>"\n4. Verify no script execution\n5. Confirm secure authentication',
-                'expected': 'System securely handles authentication and malicious input',
-                'test_data': 'SQL injection: admin\' OR \'1\'=\'1 | XSS: <script>alert(\'xss\')</script>'
-            }
-        else:
-            return {
-                'type': 'Security',
-                'priority': 'High',
-                'steps': '1. Attempt SQL injection attack\n2. Verify system sanitizes input\n3. Attempt XSS attack\n4. Verify no script execution\n5. Confirm secure handling',
-                'expected': 'System securely handles malicious input',
-                'test_data': 'SQL injection, XSS, command injection attempts'
-            }
-    
-    def _generate_functional_test(self, req, req_lower):
-        action, entity = self._extract_action_and_entity(req_lower)
+        if field_patterns and not details['business_rules']:
+            for field in field_patterns[:2]:
+                test_data = self._generate_test_data(field)
+                if test_data['boundary']:
+                    boundary_values = ' | '.join(test_data['boundary'])
+                    tests.append({
+                        'type': 'Boundary',
+                        'category': 'Boundary Value Test',
+                        'priority': 'High',
+                        'steps': f'1. {actor} enters boundary values for {field}\n2. Test minimum boundary\n3. Verify system response\n4. Test maximum boundary\n5. Confirm boundaries enforced',
+                        'expected': f'System handles boundary values for {field} correctly',
+                        'test_data': boundary_values
+                    })
         
-        if 'invalid' in req_lower:
-            return {
-                'type': 'Functional',
-                'priority': 'High',
-                'steps': f'1. Prepare invalid {entity or "data"}\n2. Attempt operation\n3. Verify error message displayed\n4. Confirm operation not executed\n5. Verify system state unchanged',
-                'expected': f'System displays error for invalid {entity or "data"}',
-                'test_data': f'Invalid {entity or "data"}'
-            }
-        elif action and entity:
-            return {
-                'type': 'Functional',
-                'priority': 'High',
-                'steps': f'1. Prepare valid {entity}\n2. {action.capitalize()} the {entity}\n3. Verify {action} operation completes\n4. Confirm {entity} state updated\n5. Validate system response',
-                'expected': f'System successfully {action}s {entity}',
-                'test_data': f'Valid {entity} for {action} operation'
-            }
-        else:
-            return {
-                'type': 'Functional',
-                'priority': 'High',
-                'steps': '1. Verify requirement functionality\n2. Execute the required operation\n3. Verify all features work as specified\n4. Check system response\n5. Confirm functionality complete',
-                'expected': 'System functionality works as specified',
-                'test_data': 'Valid data for functional testing'
-            }
+        return tests
     
-    def _generate_edge_case_test(self, req, req_lower):
-        if 'unique' in req_lower or 'duplicate' in req_lower:
-            action, entity = self._extract_action_and_entity(req_lower)
-            return {
-                'type': 'Edge Case',
-                'priority': 'High',
-                'steps': f'1. Create {entity or "item"} with unique identifier\n2. Attempt to create same {entity or "item"} again\n3. Verify system prevents duplicate\n4. Check error message\n5. Confirm uniqueness enforced',
-                'expected': f'System prevents duplicate {entity or "items"}',
-                'test_data': f'Duplicate {entity or "item"} attempt with same identifier'
-            }
-        else:
-            return {
-                'type': 'Edge Case',
-                'priority': 'Medium',
-                'steps': '1. Prepare data with special characters: "@#$%^&*()"\n2. Execute operation\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling',
-                'expected': 'System handles edge cases correctly',
-                'test_data': 'Special characters: @#$%^&*(), Unicode: ñ, é, 中文, Empty values'
-            }
-    
-    def _generate_performance_test(self, req, req_lower):
-        return {
-            'type': 'Performance',
+    def _generate_edge_case_tests(self, req, details):
+        """Generate edge case tests"""
+        tests = []
+        
+        actor = details['actor']
+        action = details['action']
+        field_patterns = details['field_patterns']
+        
+        if field_patterns:
+            for field in field_patterns[:2]:
+                test_data = self._generate_test_data(field)
+                if test_data['edge_case']:
+                    edge_values = ' | '.join(test_data['edge_case'])
+                    tests.append({
+                        'type': 'Edge Case',
+                        'category': 'Edge Case Test',
+                        'priority': 'Medium',
+                        'steps': f'1. {actor} enters edge case values for {field}\n2. Execute {action}\n3. Verify system handles edge cases\n4. Check for unexpected behavior\n5. Confirm proper handling',
+                        'expected': f'System handles edge cases for {field} correctly',
+                        'test_data': edge_values
+                    })
+        
+        tests.append({
+            'type': 'Edge Case',
+            'category': 'Edge Case Test',
             'priority': 'Medium',
-            'steps': '1. Execute operation and measure response time\n2. Verify response within acceptable time (< 2 seconds)\n3. Test with multiple concurrent requests (10+ users)\n4. Monitor system resources\n5. Confirm performance acceptable',
-            'expected': 'Operation completes within acceptable time under normal and load conditions',
-            'test_data': 'Performance monitoring: response time, CPU, memory, concurrent users'
-        }
+            'steps': f'1. {actor} prepares data with special characters: @#$%^&*()\n2. Execute {action}\n3. Verify system handles special cases\n4. Check for unexpected behavior\n5. Confirm proper handling',
+            'expected': 'System handles edge cases correctly',
+            'test_data': 'Special characters: @#$%^&*(), Unicode: ñ, é, 中文'
+        })
+        
+        tests.append({
+            'type': 'Edge Case',
+            'category': 'Edge Case Test',
+            'priority': 'Medium',
+            'steps': f'1. {actor} prepares empty/null data\n2. Execute {action}\n3. Verify system handles gracefully\n4. Check error handling\n5. Confirm no crashes occur',
+            'expected': 'System handles empty/null data gracefully',
+            'test_data': 'Empty strings, null values, whitespace'
+        })
+        
+        return tests
     
-    def _generate_data_consistency_test(self, req, req_lower):
-        action, entity = self._extract_action_and_entity(req_lower)
-        return {
-            'type': 'Data Consistency',
-            'priority': 'High',
-            'steps': f'1. Execute operation with {entity or "test"} data\n2. Verify data saved correctly\n3. Retrieve data from system\n4. Compare original and retrieved data\n5. Confirm data consistency maintained',
-            'expected': f'{entity or "Data"} remains consistent after operation',
-            'test_data': f'Various {entity or "data"} types: strings, numbers, dates, special characters'
-        }
-    
-    def _generate_message_test(self, req, req_lower, messages):
-        if messages:
-            msg = messages[0]
-            return {
-                'type': 'Message',
+    def _generate_error_handling_tests(self, req, details):
+        """Generate error handling tests"""
+        tests = []
+        
+        actor = details['actor']
+        action = details['action']
+        
+        if details['errors']:
+            tests.append({
+                'type': 'Error Handling',
+                'category': 'Error Handling Test',
                 'priority': 'High',
-                'steps': f'1. Trigger condition for message: "{msg}"\n2. Verify exact message displayed\n3. Check message visibility and formatting\n4. Verify message clarity\n5. Confirm message persists appropriately',
-                'expected': f'System displays exact message: "{msg}"',
-                'test_data': f'Condition to trigger: "{msg}"'
-            }
-        else:
-            return {
-                'type': 'Message',
-                'priority': 'High',
-                'steps': '1. Execute operation\n2. Verify success/error message displayed\n3. Check message visibility and formatting\n4. Verify message clarity\n5. Confirm message appropriate for context',
-                'expected': 'System displays appropriate message',
-                'test_data': 'Message display test data'
-            }
+                'steps': f'1. {actor} triggers error condition\n2. Verify error is caught\n3. Confirm error message displayed\n4. Check error details\n5. Validate system recovers',
+                'expected': 'System handles errors gracefully',
+                'test_data': 'Error triggering scenarios'
+            })
+        
+        if details['messages']:
+            for msg in details['messages'][:1]:
+                tests.append({
+                    'type': 'Message Validation',
+                    'category': 'Error Handling Test',
+                    'priority': 'High',
+                    'steps': f'1. {actor} triggers condition for message: "{msg}"\n2. Verify exact message displayed\n3. Check message visibility\n4. Verify message clarity\n5. Confirm message appropriate',
+                    'expected': f'System displays message: "{msg}"',
+                    'test_data': f'Condition to trigger: "{msg}"'
+                })
+        
+        return tests
     
-    def _generate_realistic_test_data(self, req_lower, data_type):
-        """Generate realistic test data based on requirement context"""
-        if 'email' in req_lower:
-            if data_type == 'valid':
-                return 'user@example.com, test@domain.co.uk'
-            else:
-                return 'invalid@, user@, @example.com, user.com'
-        elif 'username' in req_lower:
-            if data_type == 'valid':
-                return 'student, testuser, john_doe'
-            else:
-                return 'empty string, single char, special chars (!@#$%)'
-        elif 'password' in req_lower:
-            if data_type == 'valid':
-                return 'Password123, SecurePass123!, MyP@ssw0rd'
-            else:
-                return 'pass123, PASSWORD, 12345, abc'
-        elif 'phone' in req_lower:
-            if data_type == 'valid':
-                return '555-123-4567, (555) 123-4567, +1-555-123-4567'
-            else:
-                return '123, abc1234567, 55512, (555)'
-        elif 'date' in req_lower:
-            if data_type == 'valid':
-                return '12/25/2024, 2024-12-25, 25-Dec-2024'
-            else:
-                return '13/32/2024, 2024-13-01, 32/12/2024'
-        elif 'name' in req_lower:
-            if data_type == 'valid':
-                return 'John Smith, Jane Doe, Robert Johnson'
-            else:
-                return '123, @#$%, empty string'
-        elif 'amount' in req_lower or 'price' in req_lower or 'cost' in req_lower:
-            if data_type == 'valid':
-                return '100.50, 1000, 0.99'
-            else:
-                return '-100, abc, 999999999'
-        elif 'url' in req_lower or 'link' in req_lower:
-            if data_type == 'valid':
-                return 'https://example.com, https://test.co.uk'
-            else:
-                return 'invalid-url, htp://example.com, example'
-        elif 'quantity' in req_lower or 'count' in req_lower or 'number' in req_lower:
-            if data_type == 'valid':
-                return '1, 5, 10'
-            else:
-                return '0, -1, abc'
-        else:
-            if data_type == 'valid':
-                return 'Valid test data matching requirement specifications'
-            else:
-                return 'Invalid/missing data that violates requirement'
+    def _generate_security_tests(self, req, details):
+        """Generate security tests if applicable"""
+        tests = []
+        
+        actor = details['actor']
+        action = details['action']
+        
+        security_keywords = ['password', 'authenticate', 'authorize', 'permission', 'role', 'secure', 'encrypt', 'token', 'session', 'login', 'logout']
+        
+        if any(keyword in req.lower() for keyword in security_keywords):
+            tests.append({
+                'type': 'Security',
+                'category': 'Security Test',
+                'priority': 'High',
+                'steps': f'1. {actor} attempts {action} without proper authentication\n2. Verify system denies access\n3. {actor} authenticates properly\n4. Attempt {action} again\n5. Verify system allows access',
+                'expected': 'System enforces security controls',
+                'test_data': 'Authenticated and unauthenticated scenarios'
+            })
+        
+        return tests
+    
+    def _generate_ui_interaction_tests(self, req, details):
+        """Generate UI interaction tests based on detected UI elements"""
+        tests = []
+        
+        actor = details['actor']
+        ui_elements = details['ui_elements']
+        
+        if ui_elements:
+            for element in ui_elements[:2]:
+                tests.append({
+                    'type': 'UI Interaction',
+                    'category': 'UI Interaction Test',
+                    'priority': 'Medium',
+                    'steps': f'1. {actor} locates {element}\n2. Verify {element} is visible and enabled\n3. Interact with {element}\n4. Verify response to interaction\n5. Confirm expected behavior',
+                    'expected': f'{element} responds correctly to user interaction',
+                    'test_data': f'Valid interaction with {element}'
+                })
+        
+        return tests
+    
+    def _generate_workflow_tests(self, req, details):
+        """Generate end-to-end workflow tests"""
+        tests = []
+        
+        actor = details['actor']
+        workflow_steps = details['workflow_steps']
+        
+        if len(workflow_steps) > 1:
+            steps_text = '\n'.join([f'{i+1}. {step}' for i, step in enumerate(workflow_steps[:5])])
+            tests.append({
+                'type': 'Workflow',
+                'category': 'End-to-End Test',
+                'priority': 'High',
+                'steps': f'{steps_text}\n6. Verify complete workflow execution',
+                'expected': 'Complete workflow executes successfully in correct sequence',
+                'test_data': 'Multi-step workflow data'
+            })
+        
+        return tests
     
     def _generate_default_tests(self):
         return [
@@ -539,7 +756,7 @@ class AIProcessor:
                         'test_data': 'Standard test data',
                         'results': '',
                         'defects': '',
-                        'comments': 'Default test case'
+                        'comments': 'Type: Positive | Category: Positive Test | Priority: High'
                     }
                 ]
             }

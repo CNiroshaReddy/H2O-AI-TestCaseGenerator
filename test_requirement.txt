@@ -1,0 +1,3 @@
+Password Reset Requirement
+
+User should be able to reset password using registered email. System should send password reset link within 2 minutes. Email field is mandatory. Maximum 5 password reset attempts allowed per hour.
